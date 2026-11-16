@@ -34,6 +34,20 @@ dialog{margin:auto;padding:0;border:0;border-radius:8px;background:var(--paper);
 @media(max-width:1050px){.head{position:relative}.nav-toggle{display:inline-grid}.nav{display:none;position:absolute;top:100%;right:0;left:0;background:var(--paper);border:1px solid var(--line);padding:10px;box-shadow:0 10px 18px #35271e20;border-radius:0 0 6px 6px;grid-template-columns:repeat(3,1fr);gap:3px}.nav[data-open=true]{display:grid}.nav a{padding:10px}.hero{min-height:550px}.story-photo{height:340px}}
 @media(max-width:800px){.wrap{width:calc(100% - 48px)}.pad{padding-block:68px}.hero-index{right:24px}.cards{gap:10px}.card-body{padding:12px}.card-foot{flex-wrap:wrap}.split{gap:24px}}
 @media(max-width:600px){.wrap{width:calc(100% - 32px)}.pad{padding-block:52px}.head{height:64px;gap:6px}.actions{gap:7px}.actions .btn{padding:7px 8px;font-size:.75rem}.brand{gap:5px}.brand svg{width:33px;height:33px}.brand strong{font-size:1rem}.brand small{font-size:.48rem}.actions .icon{min-width:44px}.nav{grid-template-columns:repeat(2,1fr)}.hero{min-height:610px;align-items:end}.hero-photo{object-position:56% center}.hero::after{background:linear-gradient(0deg,#21150ffa 5%,#251811ce 40%,#27180e12 88%)}.hero .wrap{padding-block:80px 72px}.hero-index{right:16px;bottom:18px}.ticker .wrap{gap:4px;font-size:.64rem;letter-spacing:0}.split,.shop-grid,.faq-grid,.foot-grid{grid-template-columns:1fr}.story-photo,.gift img{height:270px}.section-head{align-items:start;flex-direction:column}.cards{grid-template-columns:1fr;gap:14px}.card img{aspect-ratio:1.68}.card-body{padding:16px}.shop-copy{padding:18px}.map{min-height:235px}.faq-grid{gap:18px}}
+/* 人來人往動畫 */
+.street{position:relative;height:150px;overflow:hidden;background:linear-gradient(#3a2a20,#2d211b 70%,#1f1712);border-bottom:1px solid var(--line)}
+.street::before{content:"";position:absolute;left:0;right:0;bottom:22px;height:2px;background:#ffc59133}
+.street-label{position:absolute;left:50%;top:12px;transform:translateX(-50%);font-size:.7rem;letter-spacing:.25em;color:#ffc591aa;white-space:nowrap}
+.walker{position:absolute;bottom:24px;left:0;animation:walk linear infinite}
+.walker.rev{animation-name:walk-rev}.walker.rev svg{transform:scaleX(-1)}
+.walker .leg,.walker .arm{transform-box:fill-box;transform-origin:top center;animation:swing .7s ease-in-out infinite alternate}
+.walker .leg.b,.walker .arm.a{animation-direction:alternate-reverse}
+.walker svg{display:block;animation:bob .35s ease-in-out infinite alternate}
+@keyframes walk{from{transform:translateX(-80px)}to{transform:translateX(calc(100vw + 80px))}}
+@keyframes walk-rev{from{transform:translateX(calc(100vw + 80px))}to{transform:translateX(-80px)}}
+@keyframes swing{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}
+@keyframes bob{from{translate:0 0}to{translate:0 -2px}}
+@media(prefers-reduced-motion:reduce){.walker,.walker *{animation-play-state:paused!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
@@ -58,6 +72,7 @@ dialog{margin:auto;padding:0;border:0;border-radius:8px;background:var(--paper);
 <div class="wrap"><p class="eyebrow">Golden Edge · 手工鍋貼專賣</p><h1 id="hero-title">一口脆，<br><span>滿口鮮。</span></h1><p>每日現包，點了才下鍋。<br>把鍋底煎成金黃的那一刻，值得多等一下。</p><div class="hero-buttons"><a class="btn" href="#order">線上點餐 <i data-lucide="arrow-up-right"></i></a><a class="btn outline" href="#locations">探索門市</a></div></div>
 <div class="hero-index">01 / Fresh off the pan</div>
 </section>
+<div class="street" id="street" aria-hidden="true"><span class="street-label">金邊鍋貼門口 · 人來人往</span></div>
 <div class="ticker"><div class="wrap"><span><b>✦</b> 台灣在地豬肉</span><span><b>✦</b> 每日手工現包</span><span><b>✦</b> 現點現煎</span></div></div>
 
 <section id="story" class="pad"><div class="wrap split">
@@ -307,6 +322,17 @@ tabs($('order'),categories,$('menu-panel'),renderProducts);
 tabs($('shops'),stores.map(s=>s.name),$('shop-panel'),renderStore);
 renderCart();document.addEventListener('DOMContentLoaded',icons,{once:true});
 $('year').textContent=new Date().getFullYear();
+</script>
+<script>
+(function(){var st=document.getElementById('street');if(!st)return;
+var cols=['#f3d9bd','#e8b98f','#d99a6c','#c98a5e','#ffc591','#b9a08a'];
+function mk(i){var w=document.createElement('div'),rev=i%2==1,h=40+Math.random()*30,c=cols[i%cols.length],sp=0.55+Math.random()*0.35;
+w.className='walker'+(rev?' rev':'');w.style.animationDuration=(9+Math.random()*10)+'s';w.style.animationDelay=(-Math.random()*19)+'s';w.style.opacity=(0.55+Math.random()*0.45).toFixed(2);
+var bag=Math.random()<.4?'<rect x="15" y="26" width="7" height="8" rx="1" fill="#a84122"/>':'';
+w.innerHTML='<svg width="'+(h*0.5)+'" height="'+h+'" viewBox="0 0 24 48"><circle cx="12" cy="6" r="5" fill="'+c+'"/><rect x="8" y="12" width="8" height="17" rx="3" fill="'+c+'"/><rect class="arm a" x="9" y="13" width="3" height="13" rx="1.5" fill="'+c+'"/><rect class="arm b" x="12" y="13" width="3" height="13" rx="1.5" fill="'+c+'"/>'+bag+'<rect class="leg a" x="9" y="28" width="3.4" height="19" rx="1.7" fill="'+c+'"/><rect class="leg b" x="11.6" y="28" width="3.4" height="19" rx="1.7" fill="'+c+'"/></svg>';
+w.querySelectorAll('.leg,.arm').forEach(function(e){e.style.animationDuration=sp+'s'});
+st.appendChild(w)}
+for(var i=0;i<14;i++)mk(i)})();
 </script>
 </body>
 </html>
