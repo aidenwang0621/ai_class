@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="金邊鍋貼：每日現包、現點現煎。探索招牌鍋貼、冷凍禮盒及門市。">
+<meta name="theme-color" content="#2d211b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="金邊鍋貼">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>金邊鍋貼 GOLDEN EDGE — 一口脆，滿口鮮</title>
 <script defer src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
@@ -212,6 +221,7 @@ dialog:not(.drawer){border-radius:18px}
 
 <footer id="contact"><div class="wrap">
 <div class="foot-grid"><div><p style="font:800 1.55rem var(--serif)">金邊鍋貼</p><p style="color:#e5cdb8;margin-top:7px">門市時間與聯絡資訊請見 <a style="text-decoration:underline" href="#locations">門市據點</a>。</p><a class="btn" style="margin-top:14px" href="https://calendar.app.google/Kvh9F95xHMtysU3NA" target="_blank" rel="noopener">預約時段 ↗</a>
+<button id="install-app" class="btn outline" style="margin:14px 0 0 8px" type="button" hidden>安裝 App</button>
 <div class="socials" aria-label="社群平台入口（示範）"><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram ↗</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook ↗</a><a href="https://line.me/zh-hant/" target="_blank" rel="noopener">LINE ↗</a></div></div>
 <div><h3>訂閱金邊電子報</h3><p id="sub-hint" style="font-size:.8rem;color:#e5cdb8;margin-top:5px">示範訂閱：不寄信，也不儲存信箱。</p><form id="subscribe" class="subscribe"><input name="email" type="email" placeholder="輸入電子郵件" aria-label="訂閱電子郵件" aria-describedby="sub-hint" required><button class="btn" type="submit">訂閱</button></form><p id="sub-status" role="status" style="color:#ffc591"></p></div></div>
 <div class="footnote"><span>© <span id="year">2026</span> 金邊鍋貼 · 品牌網站示範</span><button id="privacy-open" type="button">隱私權政策</button><a href="https://unsplash.com/photos/a-black-plate-topped-with-dumplings-on-top-of-a-wooden-table-klTf2RN37Ts" target="_blank" rel="noopener">主視覺：Mikey Frost / Unsplash ↗</a></div>
@@ -624,6 +634,15 @@ if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es
 /* 購物車數字彈跳 */
 var badge=d.getElementById('cart-count');
 if(badge&&window.MutationObserver)new MutationObserver(function(){badge.classList.remove('bump');void badge.offsetWidth;badge.classList.add('bump')}).observe(badge,{childList:true,characterData:true,subtree:true});
+})();
+</script>
+<script>
+/* PWA：註冊 service worker，並在可安裝時顯示「安裝 App」按鈕 */
+(function(){if('serviceWorker' in navigator&&location.protocol!=='file:')addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
+var btn=document.getElementById('install-app'),ev=null;if(!btn)return;
+addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;btn.hidden=false});
+btn.addEventListener('click',function(){if(!ev)return;ev.prompt();ev.userChoice.finally(function(){ev=null;btn.hidden=true})});
+addEventListener('appinstalled',function(){btn.hidden=true});
 })();
 </script>
 </body>
