@@ -1,272 +1,312 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
+<!doctype html>
+<html lang="zh-Hant-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI3 南港美食 3D 午餐選擇器</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="金邊鍋貼：每日現包、現點現煎。探索招牌鍋貼、冷凍禮盒及門市。">
+<title>金邊鍋貼 GOLDEN EDGE — 一口脆，滿口鮮</title>
+<script defer src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;font-family:-apple-system,"PingFang TC","Microsoft JhengHei",system-ui,sans-serif;background:#0f1226;color:#fff}
-#canvas-container{position:fixed;inset:0}
-header{position:fixed;top:0;left:0;right:0;padding:14px 22px;font-size:20px;font-weight:700;background:rgba(15,18,38,.55);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1);z-index:5}
-header small{font-weight:400;font-size:13px;opacity:.7;margin-left:8px}
-#ui-container{position:fixed;top:70px;left:18px;width:290px;max-height:calc(100% - 90px);overflow:auto;padding:18px;border-radius:16px;background:rgba(255,255,255,.09);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:5}
-h3{font-size:14px;margin:14px 0 8px;opacity:.85}h3:first-child{margin-top:0}
-.opts{display:flex;flex-wrap:wrap;gap:6px}
-.opts label{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);cursor:pointer;font-size:14px;user-select:none}
-.opts label:has(input:checked){background:#ff7a45}
-.opts input{accent-color:#fff}
-#count{margin:16px 0 10px;font-size:14px}
-#count b{color:#ffd166;font-size:20px}
-button{border:0;border-radius:12px;padding:12px 16px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;background:linear-gradient(135deg,#ff7a45,#ff3d71);width:100%}
-button:disabled{background:#555;cursor:not-allowed;opacity:.6}
-#hint{font-size:12px;color:#ff9b9b;margin-top:6px;min-height:16px}
-#result-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);z-index:10}
-#result-modal.hidden{display:none}
-.card{width:min(380px,92vw);padding:26px;border-radius:20px;background:rgba(30,34,66,.92);border:1px solid rgba(255,255,255,.2);text-align:center;animation:pop .35s ease-out}
-@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
-.card .label{opacity:.7;font-size:13px}
-.card h2{font-size:26px;margin:8px 0 12px;color:#ffd166}
-.card .meta{font-size:15px;margin-bottom:12px}
-.tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px}
-.tags span{font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.12)}
-.card .btns{display:grid;gap:8px}
-.card .sec{background:rgba(255,255,255,.12)}
-.note{font-size:11px;opacity:.5;margin-top:14px}
-@media (max-width:700px){#ui-container{top:auto;bottom:10px;left:10px;right:10px;width:auto;max-height:45%}header{font-size:16px}}
+/* 基礎色票與文字 */
+:root{--paper:#f8f3e9;--ink:#2b2019;--muted:#69594d;--line:#dfd2c1;--orange:#a84122;--light:#ffc591;--dark:#2d211b;--serif:"Noto Serif TC","Songti TC",serif;--sans:"Noto Sans TC","PingFang TC",sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:94px}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.7 var(--sans)}
+h1,h2,h3,p,figure{margin:0}body h1,body h2{font-family:var(--serif);line-height:1.25;font-weight:800}body h2{font-size:clamp(2rem,4.6vw,3.6rem)}body h3{line-height:1.4;font-size:1.22rem;font-weight:700}a{color:inherit;text-decoration:none}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}button,[role=tab],summary,a,input,select{outline-offset:4px}img{display:block;width:100%;object-fit:cover}svg{vertical-align:middle}i[data-lucide]{display:none}i[data-lucide="shopping-bag"],i[data-lucide="menu"]{display:block;font-style:normal;font-size:1.22rem;line-height:1}i[data-lucide="shopping-bag"]::before{content:"🛍"}i[data-lucide="menu"]::before{content:"☰"}[hidden]{display:none!important}
+.wrap{width:min(1200px,100% - 88px);margin-inline:auto}.pad{padding-block:96px}.eyebrow{display:flex;align-items:center;gap:10px;text-transform:uppercase;font-size:.72rem;font-weight:700;letter-spacing:.19em;color:var(--orange);margin-bottom:15px}.eyebrow::before{content:"";width:23px;height:1px;background:currentColor}.lead{color:var(--muted);max-width:46ch;margin-top:18px}.btn{display:inline-flex;justify-content:center;align-items:center;gap:9px;background:var(--orange);color:white;border:1px solid transparent;border-radius:5px;padding:10px 17px;font-size:.9rem;font-weight:700;min-height:44px;text-align:center}.btn:hover{background:#87331a}.btn.outline{color:inherit;background:transparent;border-color:currentColor}.btn.outline:hover{background:#a8412212}.btn svg,.details svg{width:17px;height:17px}.icon{min-width:44px;min-height:44px;display:inline-grid;place-items:center;border:1px solid var(--line);border-radius:5px;background:transparent;color:inherit;position:relative}.icon:hover{background:#a8412212}.icon svg{width:20px}.skip{position:fixed;top:8px;left:8px;z-index:99;transform:translateY(-150%)}.skip:focus{transform:none}.small{font-size:.8rem;color:var(--muted)}
+/* 導覽與主視覺 */
+header{background:var(--paper);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line)}.head{height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:inline-flex;align-items:center;gap:10px;flex:none}.brand svg{width:42px;height:42px;flex:none}.brand strong{display:block;font:800 1.19rem/1.25 var(--serif);letter-spacing:.08em}.brand small{display:block;font-size:.55rem;font-weight:800;letter-spacing:.23em}.nav{display:flex;gap:clamp(12px,1.6vw,24px);align-items:center;font-size:.82rem;font-weight:700}.nav a:hover{color:var(--orange)}.actions{display:flex;gap:10px;align-items:center}.badge{position:absolute;right:-6px;top:-7px;background:var(--orange);color:white;border:2px solid var(--paper);border-radius:30px;min-width:22px;padding:0 4px;font-size:.67rem;text-align:center}.nav-toggle{display:none}
+.hero{min-height:625px;position:relative;isolation:isolate;background:var(--dark);color:#fff6e9;display:grid;align-items:center;overflow:hidden}.hero-photo{position:absolute;z-index:-2;inset:0;height:100%;object-position:center 48%}.hero::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,#1f140ffc 2%,#261810e0 29%,#24160e63 64%,#24160e12),linear-gradient(0deg,#1e140e80,transparent 28%)}.hero .wrap{padding-block:75px 115px}.hero .eyebrow{color:var(--light)}body h1{font-size:clamp(3.2rem,7vw,6.4rem);letter-spacing:.02em}h1 span{color:var(--light)}.hero p:not(.eyebrow){margin-top:20px;color:#ffeee0;line-height:1.85}.hero-buttons{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.hero .btn.outline:hover{background:#ffffff20}.hero-index{position:absolute;bottom:27px;right:max(44px,calc((100vw - 1200px)/2));font-size:.66rem;letter-spacing:.22em;color:#fff5e9;text-transform:uppercase}.hero-index::before{content:"";display:inline-block;vertical-align:middle;width:36px;height:1px;background:currentColor;margin-right:12px}
+.ticker{border-bottom:1px solid var(--line);background:#eee2d1}.ticker .wrap{display:flex;justify-content:space-around;gap:12px;padding-block:15px;text-align:center;font-size:.78rem;font-weight:700;letter-spacing:.09em}.ticker b{color:var(--orange)}
+/* 內容、商品、門市 */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,85px);align-items:center}.story-photo{height:420px;background:#dbc2a8;border-radius:5px}.story-caption{font-size:.72rem;color:var(--muted);margin-top:9px;letter-spacing:.09em}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border-top:1px solid var(--line);margin-top:30px;padding-top:20px}.stats strong{font:800 clamp(1.3rem,3vw,2.25rem)/1.15 var(--serif);color:var(--orange);display:block}.stats small{font-size:.76rem}
+.menu{background:#efe5d7;border-block:1px solid var(--line)}.section-head{display:flex;justify-content:space-between;align-items:end;gap:14px}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:27px 0 24px}.tab{min-height:44px;padding:7px 15px;border:1px solid #b8a795;border-radius:50px;background:transparent;color:inherit;font-size:.87rem;font-weight:700}.tab[aria-selected=true]{background:var(--dark);color:#fff4e7;border-color:var(--dark)}.tab:hover:not([aria-selected=true]){background:#e5d6c4}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column}.card-photo{position:relative;background:#dcc3a8}.card img{aspect-ratio:1.55}.tag{position:absolute;top:12px;left:12px;background:#fff2de;color:#75301a;font-size:.73rem;font-weight:700;border-radius:3px;padding:3px 9px}.card-body{padding:17px;display:flex;flex-direction:column;flex:1}.desc{margin:7px 0 17px;color:var(--muted);font-size:.86rem}.card-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px}.price{font-weight:800;color:var(--orange);white-space:nowrap}
+.gift{background:var(--dark);color:#fff2e5}.gift .eyebrow,.gift .price{color:var(--light)}.gift .lead,.gift .small{color:#e8d7c6}.gift img{height:380px;border-radius:5px;background:#634b39}.gift ul{list-style:disc;padding-left:1.2em;margin:16px 0 23px;color:#ffe8d4}.gift-buy{display:flex;align-items:center;gap:16px}
+.shop-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);border:1px solid var(--line);border-radius:6px;overflow:hidden}.shop-copy{padding:26px;background:#fff9ef}.details{padding:0;list-style:none;margin:14px 0 20px;display:grid;gap:8px;font-size:.88rem}.details li{display:flex;align-items:flex-start}.details svg{flex:none;margin-top:4px;color:var(--orange);margin-right:6px}.partners{display:flex;flex-wrap:wrap;gap:9px}.partners a{border-radius:4px;padding:5px 10px;font-weight:800;font-size:.78rem;background:#203d30;color:white}.partners a:nth-child(2){background:#a51854}.map{position:relative;min-height:278px;background:#e8e6d7;display:grid;place-items:center;isolation:isolate}.map-art{position:absolute;inset:0;width:100%;height:100%;z-index:-1}.pin{display:inline-flex;align-items:center;gap:4px;background:#fffaf0;color:#743018;box-shadow:0 4px 18px #432a2530;border-radius:28px;padding:8px 15px;font-size:.83rem;font-weight:800}.pin svg{width:19px;height:19px}.map-note{position:absolute;bottom:10px;left:12px;background:#fffaf0;padding:1px 7px;font-size:.67rem;color:#473a31}
+.faq{background:#efe5d7}.faq-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:35px}.faq details{border-top:1px solid #c9b8a4}.faq details:last-child{border-bottom:1px solid #c9b8a4}.faq summary{list-style:none;padding:15px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;font-weight:700}.faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--orange);font-size:1.25rem}.faq details[open] summary::after{content:"−"}.faq details p{padding:0 20px 16px 0;color:var(--muted);font-size:.9rem}
+footer{background:#231a15;color:#fbede0;padding:51px 0 20px}.foot-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}.footnote{border-top:1px solid #ffffff28;margin-top:27px;padding-top:14px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:.76rem;color:#e5cdb8}.socials{display:flex;gap:16px;margin-top:10px;font-size:.88rem}.socials a,.footnote button{text-decoration:underline;text-underline-offset:4px}.footnote button{background:none;color:inherit;border:0;padding:0}.subscribe{display:flex;gap:8px;margin-top:10px}.subscribe input{min-width:0;flex:1}
+/* 互動視窗與表單 */
+dialog{margin:auto;padding:0;border:0;border-radius:8px;background:var(--paper);color:var(--ink);width:min(530px,100% - 28px);max-height:calc(100dvh - 32px);box-shadow:0 12px 60px #1b0d094a}dialog::backdrop{background:#201710a6}.drawer{position:fixed;inset:0 0 0 auto;margin:0;border-radius:0;width:min(440px,100%);height:100dvh;max-height:none;max-width:100%}.drawer[open]{display:flex;flex-direction:column}.box-head,.box-foot{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}.box-head h2{font-size:1.55rem}.box-body{padding:20px}.drawer .box-body{overflow:auto;flex:1}.box-foot{border-top:1px solid var(--line);border-bottom:0}.cart-line{border-bottom:1px solid var(--line);padding:12px 0;display:grid;gap:7px}.line-top,.quantity{display:flex;align-items:center;gap:9px}.line-top{justify-content:space-between}.quantity .icon{min-width:44px}.remove{margin-left:auto;color:var(--orange);min-height:44px;background:none;border:0;text-decoration:underline}.fields{display:grid;gap:12px}.fields label{display:grid;gap:4px;font-size:.88rem;font-weight:700}input,select{width:100%;border:1px solid #b8a795;background:#fffaf1;color:var(--ink);border-radius:4px;padding:8px 10px;min-height:44px}.order-modes{display:flex;flex-wrap:wrap;gap:9px 14px;border:0;margin:0;padding:0}.order-modes legend{font-size:.88rem;font-weight:700}.order-modes label{display:flex;align-items:center;gap:5px;min-height:44px}.order-modes input{width:auto;min-height:auto;accent-color:var(--orange)}.receipt{display:grid;gap:14px}.receipt .btn{justify-self:start}body:has(dialog[open]){overflow:hidden}.toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:20;width:max-content;max-width:calc(100% - 24px);pointer-events:none}.notice{background:#2b2019;color:#fff7e8;padding:10px 16px;border:1px solid #d78e66;border-radius:5px;box-shadow:0 4px 15px #231a1530;font-size:.86rem}.img-fallback{background:repeating-linear-gradient(130deg,#bb9b7c,#bb9b7c 16px,#c4a586 16px,#c4a586 32px);color:#25160f;object-fit:contain}.hero-photo.img-fallback{visibility:hidden}
+@media(max-width:1050px){.head{position:relative}.nav-toggle{display:inline-grid}.nav{display:none;position:absolute;top:100%;right:0;left:0;background:var(--paper);border:1px solid var(--line);padding:10px;box-shadow:0 10px 18px #35271e20;border-radius:0 0 6px 6px;grid-template-columns:repeat(3,1fr);gap:3px}.nav[data-open=true]{display:grid}.nav a{padding:10px}.hero{min-height:550px}.story-photo{height:340px}}
+@media(max-width:800px){.wrap{width:calc(100% - 48px)}.pad{padding-block:68px}.hero-index{right:24px}.cards{gap:10px}.card-body{padding:12px}.card-foot{flex-wrap:wrap}.split{gap:24px}}
+@media(max-width:600px){.wrap{width:calc(100% - 32px)}.pad{padding-block:52px}.head{height:64px;gap:6px}.actions{gap:7px}.actions .btn{padding:7px 8px;font-size:.75rem}.brand{gap:5px}.brand svg{width:33px;height:33px}.brand strong{font-size:1rem}.brand small{font-size:.48rem}.actions .icon{min-width:44px}.nav{grid-template-columns:repeat(2,1fr)}.hero{min-height:610px;align-items:end}.hero-photo{object-position:56% center}.hero::after{background:linear-gradient(0deg,#21150ffa 5%,#251811ce 40%,#27180e12 88%)}.hero .wrap{padding-block:80px 72px}.hero-index{right:16px;bottom:18px}.ticker .wrap{gap:4px;font-size:.64rem;letter-spacing:0}.split,.shop-grid,.faq-grid,.foot-grid{grid-template-columns:1fr}.story-photo,.gift img{height:270px}.section-head{align-items:start;flex-direction:column}.cards{grid-template-columns:1fr;gap:14px}.card img{aspect-ratio:1.68}.card-body{padding:16px}.shop-copy{padding:18px}.map{min-height:235px}.faq-grid{gap:18px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
-<div id="canvas-container"></div>
-<header><i class="fa-solid fa-utensils"></i> AI3 南港午餐 3D 決策器<small>南港軟體園區 · 半徑 2km</small></header>
+<a class="btn skip" href="#main">跳至主要內容</a>
+<!-- 固定導覽 -->
+<header>
+<div class="wrap head relative">
+<a href="#home" class="brand" aria-label="金邊鍋貼首頁">
+<svg viewBox="0 0 46 46" aria-hidden="true"><rect width="46" height="46" rx="7" fill="#a84122"/><path d="M8 30c2-9 8-15 15-15s13 6 15 15c-9 4-21 4-30 0ZM14 26l4-7m2 7 4-8m2 8 4-6M10 36h26" fill="none" stroke="#fff1d8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<span><strong>金邊鍋貼</strong><small>GOLDEN EDGE</small></span></a>
+<nav id="nav" class="nav" aria-label="主導覽"><a href="#story">品牌故事</a><a href="#menu">熱門餐點</a><a href="#order">線上點餐</a><a href="#gift">冷凍禮盒</a><a href="#locations">門市據點</a><a href="#contact">聯絡我們</a></nav>
+<div class="actions">
+<button id="cart-open" class="icon" type="button" aria-label="購物車，0 件"><i data-lucide="shopping-bag"></i><span id="cart-count" class="badge" aria-hidden="true">0</span></button>
+<a class="btn" href="#order">立即點餐</a>
+<button id="nav-toggle" class="icon nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="導覽選單"><i data-lucide="menu"></i></button>
+</div></div>
+</header>
+<main id="main">
+<section id="home" class="hero" aria-labelledby="hero-title">
+<img class="hero-photo" src="https://images.unsplash.com/photo-1738681336104-608b4e7dc3b0?auto=format&amp;fit=crop&amp;w=1800&amp;q=85" srcset="https://images.unsplash.com/photo-1738681336104-608b4e7dc3b0?auto=format&amp;fit=crop&amp;w=850&amp;q=82 850w, https://images.unsplash.com/photo-1738681336104-608b4e7dc3b0?auto=format&amp;fit=crop&amp;w=1800&amp;q=85 1800w" sizes="100vw" alt="" fetchpriority="high">
+<div class="wrap"><p class="eyebrow">Golden Edge · 手工鍋貼專賣</p><h1 id="hero-title">一口脆，<br><span>滿口鮮。</span></h1><p>每日現包，點了才下鍋。<br>把鍋底煎成金黃的那一刻，值得多等一下。</p><div class="hero-buttons"><a class="btn" href="#order">線上點餐 <i data-lucide="arrow-up-right"></i></a><a class="btn outline" href="#locations">探索門市</a></div></div>
+<div class="hero-index">01 / Fresh off the pan</div>
+</section>
+<div class="ticker"><div class="wrap"><span><b>✦</b> 台灣在地豬肉</span><span><b>✦</b> 每日手工現包</span><span><b>✦</b> 現點現煎</span></div></div>
 
-<div id="ui-container">
-  <h3><i class="fa-solid fa-person-walking"></i> 距離</h3>
-  <div class="opts" id="dist">
-    <label><input type="radio" name="d" value="500">500m</label>
-    <label><input type="radio" name="d" value="1000">1km</label>
-    <label><input type="radio" name="d" value="2000" checked>2km</label>
-  </div>
-  <h3><i class="fa-solid fa-snowflake"></i> 環境</h3>
-  <div class="opts"><label><input type="checkbox" id="ac" checked>必須有冷氣</label></div>
-  <h3><i class="fa-solid fa-bowl-food"></i> 種類</h3>
-  <div class="opts" id="cats"></div>
-  <div id="count">符合條件：<b id="n">0</b> 間</div>
-  <button id="go"><i class="fa-solid fa-dice"></i> 開始決策！</button>
-  <div id="hint"></div>
-</div>
+<section id="story" class="pad"><div class="wrap split">
+<figure><img class="story-photo" src="https://images.unsplash.com/photo-1762418967948-a243e94dd789?auto=format&amp;fit=crop&amp;w=1100&amp;q=82" alt="廚師在臺北的廚房手工包餃子，示意照" loading="lazy"><figcaption class="story-caption">01 ／ 從揉麵到捏摺，每天從頭做起。</figcaption></figure>
+<div><p class="eyebrow">01 / Our story</p><h2>鍋底的金邊，<br>是火候煎出來的。</h2><p class="lead">台灣豬肉拌上當季高麗菜，每天現包。鍋貼下鍋先煎後蒸，最後收乾水分，讓底面薄脆、上皮柔韌，咬開還有肉汁。</p>
+<div class="stats"><div><strong>10,000+</strong><small>顆／日銷示範</small></div><div><strong>100%</strong><small>現點現煎</small></div><div><strong>30 年</strong><small>老店手藝設定</small></div></div></div></div></section>
 
-<div id="result-modal" class="hidden">
-  <div class="card">
-    <div class="label">今天就吃這家 🎉</div>
-    <h2 id="r-name"></h2>
-    <div class="meta" id="r-meta"></div>
-    <div class="tags" id="r-tags"></div>
-    <div class="btns">
-      <button id="r-map"><i class="fa-solid fa-location-dot"></i> 開啟 Google 地圖導航</button>
-      <button class="sec" id="r-again"><i class="fa-solid fa-rotate"></i> 不滿意，再抽一次</button>
-      <button class="sec" id="r-filter"><i class="fa-solid fa-sliders"></i> 重新篩選</button>
-    </div>
-    <div class="note">距離為估算值，營業時間請以 Google 地圖為準</div>
-  </div>
-</div>
+<section id="menu" class="pad menu"><div class="wrap">
+<div class="section-head"><div><p class="eyebrow">02 / The menu</p><h2>今天想吃哪一味？</h2></div><p class="small">餐點照片為示意 · 價格為新臺幣</p></div>
+<div id="order" class="tabs" role="tablist" aria-label="菜單分類"></div>
+<div id="menu-panel" role="tabpanel"><div id="products" class="cards"></div></div>
+</div></section>
 
+<section id="gift" class="pad gift"><div class="wrap split">
+<div><p class="eyebrow">03 / From our pan to yours</p><h2>把金邊帶回家。</h2><p class="lead">招牌鍋貼 50 入，平日晚餐煎一盤，節慶也能送一盒。</p><ul><li>包好後用液態氮急速冷凍</li><li>不用退冰，平底鍋約 8 分鐘；請煎至內餡熟透</li></ul><p class="small">冷凍禮盒可到店取貨或模擬冷凍宅配。</p><div class="gift-buy" style="margin-top:14px"><span class="price">NT$ 580</span><button type="button" class="btn" data-add="gift"><i data-lucide="plus"></i> 加入購物車</button></div></div>
+<img src="https://images.unsplash.com/photo-1676955757361-fa71d9ea136d?auto=format&amp;fit=crop&amp;w=1100&amp;q=82" alt="排列整齊的手工餃子，禮盒示意照" loading="lazy">
+</div></section>
+
+<section id="locations" class="pad"><div class="wrap">
+<p class="eyebrow">04 / Find us</p><h2>來店吃一盤剛起鍋的。</h2><p class="lead">門市資料為示範；地圖連結可查看該區域。</p>
+<div id="shops" class="tabs" role="tablist" aria-label="切換門市"></div>
+<div id="shop-panel" class="shop-grid" role="tabpanel">
+<div class="shop-copy"><h3 id="shop-name"></h3><ul class="details">
+<li><i data-lucide="map-pin"></i><span id="shop-address"></span></li><li><i data-lucide="phone"></i><span id="shop-phone"></span></li><li><i data-lucide="clock-3"></i><span id="shop-hours"></span></li></ul><div class="partners" aria-label="外送平台入口"><a href="https://www.ubereats.com/tw" target="_blank" rel="noopener">Uber Eats ↗</a><a href="https://www.foodpanda.com.tw/" target="_blank" rel="noopener">foodpanda ↗</a></div></div>
+<div class="map"><svg class="map-art" viewBox="0 0 600 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="600" height="320" fill="#e9e5d7"/><path d="M0 250 120 222 165 320H0ZM420 0h180v115l-92 15Z" fill="#d1dfca"/><path d="M495 320 610 176" stroke="#c2dfeb" stroke-width="42"/><g stroke="#fffdf6" stroke-width="17" fill="none"><path d="M-5 90 605 155M-5 208 605 241M95-10l-8 330M253-8l-22 335M380-5l-40 330M518-10l-77 340"/></g><path d="M-5 145 605 196M155-5l29 330" fill="none" stroke="#f5d6a6" stroke-width="12"/></svg><a id="map-link" class="pin" target="_blank" rel="noopener"><i data-lucide="map-pin"></i> <span id="map-label"></span> ↗</a><span class="map-note">示意地圖 · 在 Google Maps 查看</span></div>
+</div></div></section>
+
+<section id="faq" class="pad faq"><div class="wrap faq-grid">
+<div><p class="eyebrow">05 / FAQ</p><h2>常見問題</h2></div>
+<div>
+<details name="faq"><summary>怎麼點餐？可以到店自取嗎？</summary><p>選好餐點後打開購物車，選擇內用或外帶，再選門市與填寫聯絡資訊。這是模擬流程，門市不會收到訂單。</p></details>
+<details name="faq"><summary>冷凍鍋貼怎麼保存與加熱？</summary><p>收到後立即放入冷凍庫，保存期限以包裝為準。取出後不用退冰，依包裝指示煎煮，確認內餡完全熟透再食用。</p></details>
+<details name="faq"><summary>熟食外送與冷凍宅配有什麼不同？</summary><p>熟食外送請到外送平台查詢供應與範圍。站內的宅配選項只適用於冷凍禮盒；熟食與冷凍宅配請分開下單。</p></details>
+<details name="faq"><summary>餐點含有哪些常見過敏原？</summary><p>鍋貼與水餃外皮含小麥，部分餡料與醬汁可能含大豆、芝麻或甲殼類。實際販售時，請以店家提供的成分資訊為準。</p></details>
+</div></div></section>
+</main>
+
+<footer id="contact"><div class="wrap">
+<div class="foot-grid"><div><p style="font:800 1.55rem var(--serif)">金邊鍋貼</p><p style="color:#e5cdb8;margin-top:7px">門市時間與聯絡資訊請見 <a style="text-decoration:underline" href="#locations">門市據點</a>。</p><a class="btn" style="margin-top:14px" href="https://calendar.app.google/Kvh9F95xHMtysU3NA" target="_blank" rel="noopener">預約時段 ↗</a>
+<div class="socials" aria-label="社群平台入口（示範）"><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram ↗</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook ↗</a><a href="https://line.me/zh-hant/" target="_blank" rel="noopener">LINE ↗</a></div></div>
+<div><h3>訂閱金邊電子報</h3><p id="sub-hint" style="font-size:.8rem;color:#e5cdb8;margin-top:5px">示範訂閱：不寄信，也不儲存信箱。</p><form id="subscribe" class="subscribe"><input name="email" type="email" placeholder="輸入電子郵件" aria-label="訂閱電子郵件" aria-describedby="sub-hint" required><button class="btn" type="submit">訂閱</button></form><p id="sub-status" role="status" style="color:#ffc591"></p></div></div>
+<div class="footnote"><span>© <span id="year">2026</span> 金邊鍋貼 · 品牌網站示範</span><button id="privacy-open" type="button">隱私權政策</button><a href="https://unsplash.com/photos/a-black-plate-topped-with-dumplings-on-top-of-a-wooden-table-klTf2RN37Ts" target="_blank" rel="noopener">主視覺：Mikey Frost / Unsplash ↗</a></div>
+</div></footer>
+
+<!-- 原生 dialog 提供鍵盤焦點管理與 Escape 關閉 -->
+<dialog id="cart" class="drawer" aria-labelledby="cart-title"><div class="box-head"><h2 id="cart-title">購物車</h2><button class="icon" type="button" data-close aria-label="關閉購物車">✕</button></div><div id="cart-items" class="box-body"></div><div class="box-foot"><div><div>商品總計</div><strong id="cart-total" class="price"></strong></div><button id="checkout-open" class="btn" type="button">前往結帳</button></div></dialog>
+<dialog id="checkout" aria-labelledby="checkout-title"><div class="box-head"><h2 id="checkout-title">確認訂單</h2><button class="icon" type="button" data-close aria-label="關閉訂單確認">✕</button></div>
+<form id="checkout-form"><div class="box-body fields">
+<p class="small">模擬結帳，無須付款。聯絡資料不會送出或儲存。</p>
+<fieldset class="order-modes"><legend>取餐方式</legend><label><input type="radio" name="mode" value="內用" checked>內用</label><label><input type="radio" name="mode" value="外帶">外帶</label><label><input type="radio" name="mode" value="宅配">宅配（冷凍）</label></fieldset>
+<p id="mode-note" class="small"></p>
+<label id="pickup-field">取餐門市<select name="store"></select></label>
+<label id="address-field" hidden>收件地址<input name="address" autocomplete="street-address" maxlength="160" disabled></label>
+<label>聯絡姓名<input name="name" autocomplete="name" maxlength="50" required></label>
+<label>聯絡電話<input type="tel" name="phone" autocomplete="tel" minlength="8" maxlength="24" required></label>
+<div id="checkout-items" class="small"></div></div>
+<div class="box-foot"><button id="back-cart" type="button" class="btn outline">返回購物車</button><button type="submit" class="btn">建立模擬訂單</button></div></form>
+<div id="receipt" class="box-body receipt" hidden><h3>✓ 訂單已建立</h3><p id="receipt-text"></p><p class="small">這筆訂單只顯示在此頁，店家不會收到。</p><button class="btn" type="button" data-close>繼續逛菜單</button></div>
+</dialog>
+<dialog id="privacy" aria-labelledby="privacy-title"><div class="box-head"><h2 id="privacy-title">隱私權政策</h2><button class="icon" type="button" data-close aria-label="關閉隱私權政策">✕</button></div><div class="box-body"><p>本頁是品牌網站示範。購物車僅在可用時把商品與件數存在瀏覽器。訂單與訂閱表單不傳送或儲存聯絡資料。照片、字體、圖標與樣式由外部服務提供；外部連結由各平台的隱私權政策規範。</p></div></dialog>
+<div class="toasts" role="status" aria-live="polite"><div id="toast" class="notice" hidden></div></div>
 <script>
-// ===== 1. 餐廳資料庫（距離為從南港軟體園區估算，需實地核對）=====
-const CATS = ["麵","飯","鍋貼/水餃","漢堡/美式","小吃/湯包","健康餐/沙拉"];
-const R = (id,name,d,ac,cats,price)=>({id,name,distanceMeters:d,hasAC:ac,categories:cats,priceRange:price,
-  googleMapUrl:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(name+" 南港")});
-const DEFAULT_DATA = [
-  // 南港軟體園區內 / 三重路周邊（店名與位置取自網路美食文章，2026-11 查）
-  R("r01","OSHO拉麵 (南港軟體園區)",200,true,["麵"],"$$"),
-  R("r02","大河屋 南港中信店",300,true,["飯"],"$$"),
-  R("r03","春月日式食堂",400,true,["飯"],"$$"),
-  R("r04","三川田輕麻辣風麵食館",450,false,["麵","小吃/湯包"],"$"),
-  R("r05","Gonna 共樂遊食",400,true,["健康餐/沙拉","漢堡/美式"],"$$"),
-  // 南港車站 / CITYLINK / 南港環球
-  R("r06","朱記餡餅粥店 (南港環球店)",1300,true,["麵","飯","鍋貼/水餃"],"$$"),
-  R("r07","北大荒水餃 (南港)",1300,false,["鍋貼/水餃","麵"],"$"),
-  R("r08","台鐵夢工場 南港店",1300,true,["飯"],"$"),
-  R("r09","爭鮮 (南港)",1300,true,["飯"],"$$"),
-  R("r10","好好食房 (CITYLINK南港)",1300,true,["麵","飯"],"$$"),
-  R("r11","麵家三士 (CITYLINK南港)",1300,true,["麵"],"$$"),
-  R("r12","美利茶餐廳 (CITYLINK南港)",1300,true,["麵","飯","小吃/湯包"],"$$"),
-  R("r13","杏子日式豬排 (CITYLINK南港)",1300,true,["飯"],"$$"),
-  R("r14","The Chips 美式餐廳 (CITYLINK南港)",1300,true,["漢堡/美式"],"$$$"),
-  R("r15","貳樓 Second Floor (CITYLINK南港)",1300,true,["漢堡/美式","健康餐/沙拉"],"$$$"),
+'use strict';
+// 目錄與門市均為示範資料；價格以整數新臺幣計算。
+const $ = id => document.getElementById(id);
+const categories = ['招牌鍋貼','精選水餃','湯品／飲料','經典小菜'];
+const photos = {
+  golden:'1738681336104-608b4e7dc3b0', pan:'1769610712810-ec91babfccd3',
+  handmade:'1676955757361-fa71d9ea136d', steamed:'1762418967889-10abec43c325',
+  soup:'1547592180-85f173990554', tea:'1544787219-7f47ccb76574',
+  greens:'1512621776951-a57141f2eefd', sides:'1540189549336-e6e99c3679fe'
+};
+const catalog = [
+  ['original',0,'招牌鮮肉鍋貼','台灣豬肉與高麗菜，底脆、內餡多汁。8 入。',88,'人氣首選','golden'],
+  ['chive',0,'韭香鮮肉鍋貼','韭菜拌入鮮豬肉，煎到香氣跑出鍋邊。8 入。',96,'韭菜香','pan'],
+  ['chili',0,'椒麻紅油鍋貼','酥脆鍋貼淋上花椒紅油。8 入。',108,'中辣','golden'],
+  ['shrimp',1,'鮮蝦豬肉水餃','鮮蝦與豬肉同包，咬得到蝦肉。8 入。',128,'鮮蝦','steamed'],
+  ['cabbage',1,'高麗菜鮮肉水餃','高麗菜的清甜配上鮮豬肉。8 入。',88,'經典','handmade'],
+  ['soup',2,'酸辣湯','豆腐、木耳與蛋花，微酸帶辣。',55,'微辣','soup'],
+  ['tea',2,'無糖焙香烏龍','帶焙火香的冷泡烏龍，搭鍋貼剛好。',40,'無糖','tea'],
+  ['cucumber',3,'蒜香脆小黃瓜','冰鎮小黃瓜拌蒜末，入口清脆。',48,'清爽','greens'],
+  ['tofu',3,'胡麻時蔬','時蔬拌上胡麻醬，依季節更換。',60,'芝麻香','sides'],
+  ['gift',-1,'招牌冷凍鍋貼禮盒','50 入',580,'冷凍','handmade']
+].map(([id,cat,name,desc,price,tag,photo])=>({id,cat,name,desc,price,tag,photo}));
+const byId = new Map(catalog.map(item=>[item.id,item]));
+const stores = [
+  {name:'中山旗艦店',address:'台北市中山區南京西路商圈（示範）',phone:'02-0000-0101',hours:'週一至週日 11:30–21:00',query:'台北市中山區 捷運中山站'},
+  {name:'信義店',address:'台北市信義區松高路商圈（示範）',phone:'02-0000-0102',hours:'週二至週日 11:30–20:30，週一公休',query:'台北市信義區 松高路'}
 ];
-let DATA = DEFAULT_DATA;
-try{const s=localStorage.getItem("ai3-restaurants"); if(s) DATA=JSON.parse(s);}catch(e){}
-
-// ===== 2. Three.js 初始化 =====
-const box=document.getElementById("canvas-container");
-const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-box.appendChild(renderer.domElement);
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x0f1226);
-const camera=new THREE.PerspectiveCamera(45,1,0.1,100);
-camera.position.set(0,-1.2,11); camera.lookAt(0,0,0);
-scene.add(new THREE.AmbientLight(0xffffff,0.55));
-const dl=new THREE.DirectionalLight(0xffffff,0.9); dl.position.set(4,6,10); scene.add(dl);
-const pl=new THREE.PointLight(0xff7a45,0.6,30); pl.position.set(-6,-4,6); scene.add(pl);
-
-const wheelGroup=new THREE.Group(); scene.add(wheelGroup);
-// 指針
-const pointer=new THREE.Mesh(new THREE.ConeGeometry(0.35,0.8,3),new THREE.MeshStandardMaterial({color:0xffd166,metalness:.4,roughness:.3}));
-pointer.rotation.z=Math.PI; pointer.position.set(0,4.15,0.6); scene.add(pointer);
-// 底座環
-const ring=new THREE.Mesh(new THREE.TorusGeometry(3.85,0.12,16,100),new THREE.MeshStandardMaterial({color:0xffd166,metalness:.7,roughness:.25}));
-ring.position.z=0.3; scene.add(ring);
-
-function resize(){
-  const w=innerWidth,h=innerHeight;
-  renderer.setSize(w,h); camera.aspect=w/h;
-  const mobile=w<700;
-  camera.position.z = mobile ? 15 : 11;
-  scene.position.set(mobile?0:1.8, mobile?2.2:0, 0);
-  camera.updateProjectionMatrix();
+const money = n => 'NT$ ' + n.toLocaleString('zh-TW');
+const key = 'golden-edge-cart-v1';
+let items = new Map(), activeStore = 0, toastTimer;
+try {
+  const saved = JSON.parse(localStorage.getItem(key) || '[]');
+  if(Array.isArray(saved)) for(const row of saved) {
+    if(!Array.isArray(row)) continue;
+    const [id,qty] = row;
+    if(byId.has(id) && Number.isInteger(qty) && qty>0 && qty<=99) items.set(id,qty);
+  }
+} catch { /* 禁用本機儲存時，購物車仍可在當前頁操作。 */ }
+const cartButton = $('cart-open');
+const cart = $('cart'), checkout = $('checkout'), form = $('checkout-form');
+function icons(){
+  if(window.lucide) window.lucide.createIcons({attrs:{'aria-hidden':'true'}});
 }
-addEventListener("resize",resize); resize();
-
-// ===== 3. 動態輪盤生成 =====
-const COLORS=[0xff7a45,0x3a86ff,0x06d6a0,0xef476f,0x8338ec,0xffbe0b,0x118ab2,0xf15bb5];
-function textTexture(text){
-  const c=document.createElement("canvas"); c.width=512; c.height=96;
-  const g=c.getContext("2d");
-  let size=52; g.font=`bold ${size}px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif`;
-  while(g.measureText(text).width>490 && size>18){size-=2; g.font=`bold ${size}px -apple-system,"PingFang TC","Microsoft JhengHei",sans-serif`;}
-  g.fillStyle="#fff"; g.textAlign="right"; g.textBaseline="middle";
-  g.shadowColor="rgba(0,0,0,.5)"; g.shadowBlur=6;
-  g.fillText(text,500,48);
-  const t=new THREE.CanvasTexture(c); t.anisotropy=4; return t;
+function handleImage(img) {
+  if(!img.dataset.fallbackBound){
+    img.dataset.fallbackBound='true';
+    img.addEventListener('error',()=>img.classList.add('img-fallback'));
+    img.addEventListener('load',()=>img.classList.remove('img-fallback'));
+  }
+  if(img.complete && !img.naturalWidth) img.classList.add('img-fallback');
 }
-function clearWheel(){
-  while(wheelGroup.children.length){const m=wheelGroup.children.pop();
-    m.geometry.dispose(); if(m.material.map) m.material.map.dispose(); m.material.dispose();}
-}
-let slices=[];
-function buildWheel(list){
-  clearWheel(); slices=list;
-  const n=Math.max(list.length,1), seg=Math.PI*2/n;
-  list.forEach((r,i)=>{
-    // CylinderGeometry 的 theta 繞 Y 軸，旋轉 X 90° 讓它面向相機
-    const geo=new THREE.CylinderGeometry(3.7,3.7,0.4,Math.max(4,Math.ceil(64/n)),1,false,i*seg,seg);
-    const mat=new THREE.MeshStandardMaterial({color:COLORS[i%COLORS.length],roughness:.45,metalness:.15});
-    const m=new THREE.Mesh(geo,mat); m.rotation.x=Math.PI/2; wheelGroup.add(m);
-    // 文字貼圖：放在扇形中線
-    const mid=i*seg+seg/2; // cylinder theta: x=sin, z=cos → 轉 X 後 (sin, -cos)?? 計算如下
-    const ang=Math.atan2(-Math.cos(mid),Math.sin(mid)); // 扇形中線在 XY 平面的角度
-    const label=new THREE.Mesh(new THREE.PlaneGeometry(3.3,0.62),
-      new THREE.MeshBasicMaterial({map:textTexture(r.name),transparent:true,depthWrite:false}));
-    label.position.set(Math.cos(ang)*1.95,Math.sin(ang)*1.95,0.22);
-    label.rotation.z=ang; wheelGroup.add(label);
-    r._ang=ang;
+function tabs(host, labels, panel, render) {
+  const buttons = labels.map((label,index)=>{
+    const button = document.createElement('button');
+    button.type='button';button.className='tab';button.id=host.id+'-tab-'+index;
+    button.setAttribute('role','tab');button.setAttribute('aria-controls',panel.id);
+    button.textContent=label;host.append(button);
+    button.addEventListener('click',()=>select(index));
+    button.addEventListener('keydown',e=>{
+      const next = {ArrowRight:(index+1)%labels.length,ArrowLeft:(index-1+labels.length)%labels.length,Home:0,End:labels.length-1}[e.key];
+      if(next===undefined) return;
+      e.preventDefault();select(next);buttons[next].focus();
+    });
+    return button;
   });
-  if(!list.length){
-    const label=new THREE.Mesh(new THREE.PlaneGeometry(4,0.75),new THREE.MeshBasicMaterial({map:textTexture("沒有符合的餐廳"),transparent:true}));
-    label.position.x=-2; wheelGroup.add(label);
+  function select(index){
+    buttons.forEach((button,i)=>{button.tabIndex=i===index?0:-1;button.setAttribute('aria-selected',String(i===index));});
+    panel.setAttribute('aria-labelledby',buttons[index].id);
+    render(index);
   }
-  const hub=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.55,0.6,32),new THREE.MeshStandardMaterial({color:0xffffff,metalness:.5,roughness:.3}));
-  hub.rotation.x=Math.PI/2; wheelGroup.add(hub);
+  select(0);
 }
-
-// ===== 4. 篩選 =====
-const catBox=document.getElementById("cats");
-CATS.forEach(c=>catBox.insertAdjacentHTML("beforeend",`<label><input type="checkbox" value="${c}" checked>${c}</label>`));
-function filtered(){
-  const d=+document.querySelector('input[name=d]:checked').value;
-  const ac=document.getElementById("ac").checked;
-  const cs=[...catBox.querySelectorAll("input:checked")].map(i=>i.value);
-  return DATA.filter(r=>r.distanceMeters<=d && (!ac||r.hasAC) && r.categories.some(c=>cs.includes(c)));
+function renderProducts(index){
+  $('products').innerHTML = catalog.filter(p=>p.cat===index).map(p=>
+    '<article class="card"><div class="card-photo"><img src="https://images.unsplash.com/photo-'+photos[p.photo]+'?auto=format&amp;fit=crop&amp;w=760&amp;q=82" alt="'+p.name+'示意照" loading="lazy"><span class="tag">'+p.tag+'</span></div><div class="card-body"><h3>'+p.name+'</h3><p class="desc">'+p.desc+'</p><div class="card-foot"><span class="price">'+money(p.price)+'</span><button type="button" class="btn outline" data-add="'+p.id+'" aria-label="將'+p.name+'加入購物車"><i data-lucide="plus"></i> 加入購物車</button></div></div></article>'
+  ).join('');
+  $('products').querySelectorAll('img').forEach(handleImage);icons();
 }
-const goBtn=document.getElementById("go"), hint=document.getElementById("hint");
-function refresh(){
-  const list=filtered();
-  document.getElementById("n").textContent=list.length;
-  goBtn.disabled=!list.length || spinning;
-  hint.textContent=list.length?"":"沒有符合條件的餐廳，請放寬篩選";
-  wheelGroup.rotation.z=0; buildWheel(list);
+function renderStore(index){
+  activeStore=index;
+  const s=stores[index];
+  for(const field of ['name','address','phone','hours']) $('shop-'+field).textContent=s[field];
+  $('map-label').textContent=s.name;
+  $('map-link').href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(s.query);
 }
-document.getElementById("ui-container").addEventListener("change",()=>{if(!spinning)refresh();});
-
-// ===== 5. 轉動動畫（Ease-Out）=====
-let spinning=false, spin=null, idle=true;
-const easeOutCubic=t=>1-Math.pow(1-t,3);
-function startSpin(){
-  if(!slices.length||spinning) return;
-  spinning=true; idle=false; goBtn.disabled=true;
-  const pick=Math.floor(Math.random()*slices.length);
-  const target=slices[pick];
-  // 指針在 +Y (π/2)；要讓 target._ang + rot ≡ π/2
-  const cur=wheelGroup.rotation.z;
-  let end=Math.PI/2-target._ang;
-  end+= Math.ceil((cur-end)/(Math.PI*2))*Math.PI*2 ; // 對齊到 cur 之上
-  end+= Math.PI*2*6; // 多轉 6 圈
-  const seg=Math.PI*2/slices.length;
-  end+= (Math.random()-.5)*seg*0.6; // 扇形內隨機偏移
-  spin={from:cur,to:end,t0:performance.now(),dur:3000,pick:target};
+function announce(message){
+  clearTimeout(toastTimer);
+  const toast=$('toast');
+  toast.hidden=false;
+  toast.textContent=message;
+  toastTimer=setTimeout(()=>{toast.hidden=true;toast.textContent='';},3000);
 }
-
-// ===== 粒子 Confetti =====
-let confetti=null;
-function burst(){
-  const N=400, pos=new Float32Array(N*3), col=new Float32Array(N*3), vel=[];
-  const c=new THREE.Color();
-  for(let i=0;i<N;i++){
-    pos.set([0,3.5,1],i*3);
-    vel.push(new THREE.Vector3((Math.random()-.5)*0.35,Math.random()*0.3+0.05,(Math.random()-.2)*0.25));
-    c.setHex(COLORS[i%COLORS.length]); col.set([c.r,c.g,c.b],i*3);
+function totals(){
+  let count=0,total=0;
+  for(const [id,qty] of items){count+=qty;total+=byId.get(id).price*qty;}
+  return {count,total};
+}
+function renderCart(focus){
+  const {count,total}=totals();
+  $('cart-count').textContent=count;
+  cartButton.setAttribute('aria-label','購物車，'+count+' 件');
+  $('cart-total').textContent=money(total);
+  $('checkout-open').disabled=!count;
+  $('cart-items').innerHTML=count ? '<p class="small">共 '+count+' 件商品</p>'+[...items].map(([id,qty])=>{
+    const p=byId.get(id);
+    return '<article class="cart-line"><div class="line-top"><h3>'+p.name+'</h3><strong class="price">'+money(p.price*qty)+'</strong></div><p class="small">單價 '+money(p.price)+'</p><div class="quantity"><button class="icon" type="button" data-id="'+id+'" data-step="-1" aria-label="減少'+p.name+'數量">−</button><span aria-label="數量">'+qty+'</span><button class="icon" type="button" data-id="'+id+'" data-step="1" aria-label="增加'+p.name+'數量" '+(qty===99?'disabled':'')+'>+</button><button class="remove" type="button" data-id="'+id+'" data-step="remove" aria-label="移除'+p.name+'">移除</button></div></article>';
+  }).join('') : '<p>購物車還是空的。</p><button type="button" data-close class="btn outline" style="margin-top:15px">繼續逛菜單</button>';
+  if(focus && cart.open){
+    const replacement=cart.querySelector('[data-id="'+focus.id+'"][data-step="'+focus.step+'"]:not(:disabled)') || cart.querySelector('.quantity button:not(:disabled), .box-body [data-close]') || cart.querySelector('[data-close]');
+    replacement.focus();
   }
-  const g=new THREE.BufferGeometry();
-  g.setAttribute("position",new THREE.BufferAttribute(pos,3));
-  g.setAttribute("color",new THREE.BufferAttribute(col,3));
-  if(confetti){scene.remove(confetti.pts);confetti.pts.geometry.dispose();}
-  const pts=new THREE.Points(g,new THREE.PointsMaterial({size:0.14,vertexColors:true,transparent:true}));
-  scene.add(pts); confetti={pts,vel,life:0};
 }
-
-// ===== 6. 結果 =====
-const modal=document.getElementById("result-modal"); let current=null;
-function showResult(r){
-  current=r;
-  document.getElementById("r-name").textContent=r.name;
-  const mins=Math.max(1,Math.round(r.distanceMeters/80));
-  document.getElementById("r-meta").textContent=`${r.distanceMeters} 公尺，步行約 ${mins} 分鐘 · ${r.priceRange}`;
-  document.getElementById("r-tags").innerHTML=[r.hasAC?"❄️ 有冷氣":"🌤 無冷氣",...r.categories].map(t=>`<span>${t}</span>`).join("");
-  modal.classList.remove("hidden");
+function persist(focus){
+  try{localStorage.setItem(key,JSON.stringify([...items]));}catch{}
+  renderCart(focus);
 }
-document.getElementById("r-map").onclick=()=>window.open(current.googleMapUrl,"_blank");
-document.getElementById("r-again").onclick=()=>{modal.classList.add("hidden");startSpin();};
-document.getElementById("r-filter").onclick=()=>{modal.classList.add("hidden");idle=true;};
-goBtn.onclick=startSpin;
-
-// ===== 渲染迴圈 =====
-let last=performance.now();
-function loop(now){
-  requestAnimationFrame(loop);
-  const dt=Math.min((now-last)/16.67,3); last=now;
-  if(spin){
-    const t=Math.min((now-spin.t0)/spin.dur,1);
-    wheelGroup.rotation.z=spin.from+(spin.to-spin.from)*easeOutCubic(t);
-    if(t>=1){const r=spin.pick; spin=null; spinning=false; goBtn.disabled=!slices.length; burst(); setTimeout(()=>showResult(r),500);}
-  }else if(idle){ wheelGroup.rotation.z+=0.002*dt; }
-  wheelGroup.rotation.x=Math.sin(now/1800)*0.06;
-  if(confetti){
-    const p=confetti.pts.geometry.attributes.position;
-    for(let i=0;i<confetti.vel.length;i++){
-      const v=confetti.vel[i]; v.y-=0.006*dt; v.multiplyScalar(0.99);
-      p.array[i*3]+=v.x*dt; p.array[i*3+1]+=v.y*dt; p.array[i*3+2]+=v.z*dt;
-    }
-    p.needsUpdate=true; confetti.life+=dt;
-    confetti.pts.material.opacity=Math.max(0,1-confetti.life/180);
-    if(confetti.life>180){scene.remove(confetti.pts);confetti.pts.geometry.dispose();confetti=null;}
+function changeItem(id,delta,focus){
+  if(!byId.has(id)) return;
+  const next=(items.get(id)||0)+delta;
+  if(next>99){announce('單品最多 99 份');return false;}
+  if(next<=0) items.delete(id); else items.set(id,next);
+  persist(focus);return true;
+}
+function syncMode(){
+  const delivery=form.elements.mode.value==='宅配';
+  const {address,store}=form.elements;
+  $('address-field').hidden=!delivery;address.disabled=!delivery;address.required=delivery;
+  $('pickup-field').hidden=delivery;store.disabled=delivery;store.required=!delivery;
+}
+function openCheckout(){
+  if(!items.size) return;
+  const onlyFrozen=items.size===1 && items.has('gift');
+  const dine=form.querySelector('[value="內用"]'), ship=form.querySelector('[value="宅配"]');
+  form.reset();
+  dine.disabled=items.has('gift');ship.disabled=!onlyFrozen;
+  (dine.disabled?form.querySelector('[value="外帶"]'):dine).checked=true;
+  form.elements.store.value=String(activeStore);
+  $('mode-note').textContent=onlyFrozen?'冷凍禮盒可到店取貨或宅配。':items.has('gift')?'熟食與禮盒一起買可外帶；若要宅配請將禮盒分開下單。':'熟食可內用或外帶；外送請至門市頁的外送平台。';
+  $('checkout-items').textContent=[...items].map(([id,qty])=>byId.get(id).name+' × '+qty).join('、')+'｜商品總計 '+money(totals().total)+'（示範免運）';
+  $('checkout-title').textContent='確認訂單';form.hidden=false;$('receipt').hidden=true;
+  syncMode();cart.close();checkout.showModal();
+}
+function hideNav(){
+  $('nav').dataset.open='false';$('nav-toggle').setAttribute('aria-expanded','false');
+}
+$('nav-toggle').addEventListener('click',()=>{
+  const open=$('nav-toggle').getAttribute('aria-expanded')!=='true';
+  $('nav').dataset.open=String(open);$('nav-toggle').setAttribute('aria-expanded',String(open));
+});
+$('nav').addEventListener('click',e=>{if(e.target.closest('a')) hideNav();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape' && $('nav').dataset.open==='true'){hideNav();$('nav-toggle').focus();}
+});
+document.addEventListener('click',e=>{
+  const add=e.target.closest('[data-add]');
+  if(add && changeItem(add.dataset.add,1)) announce('已加入購物車：'+byId.get(add.dataset.add).name);
+  const action=e.target.closest('[data-step]');
+  if(action){
+    const {id,step}=action.dataset;
+    changeItem(id,step==='remove'?-(items.get(id)||0):Number(step),{id,step});
   }
-  renderer.render(scene,camera);
-}
-refresh(); requestAnimationFrame(loop);
+  const close=e.target.closest('[data-close]');
+  if(close) close.closest('dialog').close();
+});
+cartButton.addEventListener('click',()=>{hideNav();cart.showModal();});
+$('checkout-open').addEventListener('click',openCheckout);
+$('back-cart').addEventListener('click',()=>{checkout.close();cart.showModal();});
+form.addEventListener('change',syncMode);
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  if(!items.size || !form.reportValidity()) return;
+  const mode=form.elements.mode.value;
+  const place=mode==='宅配'?'冷凍宅配':stores[form.elements.store.value].name+' · '+mode;
+  $('receipt-text').textContent=place+'｜'+totals().count+' 件 · '+money(totals().total);
+  items.clear();persist();form.reset();form.hidden=true;
+  $('checkout-title').textContent='訂單完成';$('receipt').hidden=false;
+  $('receipt').querySelector('button').focus();
+});
+checkout.addEventListener('close',()=>{form.reset();if(!cart.open && !checkout.open) cartButton.focus();});
+$('privacy-open').addEventListener('click',()=>$('privacy').showModal());
+$('subscribe').addEventListener('submit',e=>{e.preventDefault();e.target.reset();$('sub-status').textContent='已完成示範訂閱。';});
+stores.forEach((store,index)=>form.elements.store.add(new Option(store.name,String(index))));
+document.querySelectorAll('img').forEach(handleImage);
+tabs($('order'),categories,$('menu-panel'),renderProducts);
+tabs($('shops'),stores.map(s=>s.name),$('shop-panel'),renderStore);
+renderCart();document.addEventListener('DOMContentLoaded',icons,{once:true});
+$('year').textContent=new Date().getFullYear();
 </script>
 </body>
 </html>
