@@ -276,7 +276,7 @@ const stores = [
 ];
 const money = n => 'NT$ ' + n.toLocaleString('zh-TW');
 // 結帳串接 Google 試算表：貼上 Apps Script 網路應用程式網址（/exec 結尾）。留空則維持示範模式，不送出任何資料。設定方式見 gas/README.md。
-const GAS_URL = '';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyiSotjOHq5jWmEimvrGAD2UjF5lygnra67iPrOXBH-u7sqZtDMKUDzeTey5AfcK_HPJg/exec';
 const key = 'golden-edge-cart-v1';
 let items = new Map(), activeStore = 0, toastTimer, sending = false, orderRequestId = '';
 try {
