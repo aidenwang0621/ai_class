@@ -1,5 +1,5 @@
 /* 金邊鍋貼 PWA service worker */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL = 'golden-edge-shell-' + VERSION;
 const RUNTIME = 'golden-edge-runtime-' + VERSION;
 const SHELL_FILES = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
@@ -24,7 +24,8 @@ self.addEventListener('fetch', event => {
   // 頁面與本站檔案：先連網拿最新版，離線時才用快取。
   if (req.mode === 'navigate' || sameOrigin) {
     event.respondWith(
-      fetch(req).then(res => {
+      // no-cache：每次都向伺服器確認，避免瀏覽器拿自己存的舊頁面（例如還在示範模式的舊版結帳）。
+      fetch(req, { cache: 'no-cache' }).then(res => {
         if (res.ok) { const copy = res.clone(); caches.open(SHELL).then(c => c.put(req, copy)); }
         return res;
       }).catch(() => caches.match(req).then(hit => hit || (req.mode === 'navigate' ? caches.match('index.html') : Response.error())))
