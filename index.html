@@ -212,7 +212,7 @@ dialog:not(.drawer){border-radius:18px}
 <section id="faq" class="pad faq"><div class="wrap faq-grid">
 <div><p class="eyebrow">05 / FAQ</p><h2>常見問題</h2></div>
 <div>
-<details name="faq"><summary>怎麼點餐？可以到店自取嗎？</summary><p>選好餐點後打開購物車，選擇內用或外帶，再選門市與填寫聯絡資訊。這是模擬流程，門市不會收到訂單。</p></details>
+<details name="faq"><summary>怎麼點餐？可以到店自取嗎？</summary><p>選好餐點後打開購物車，選擇內用或外帶，再選門市與填寫聯絡資訊。<span id="faq-order-note">這是模擬流程，門市不會收到訂單。</span></p></details>
 <details name="faq"><summary>冷凍鍋貼怎麼保存與加熱？</summary><p>收到後立即放入冷凍庫，保存期限以包裝為準。取出後不用退冰，依包裝指示煎煮，確認內餡完全熟透再食用。</p></details>
 <details name="faq"><summary>熟食外送與冷凍宅配有什麼不同？</summary><p>熟食外送請到外送平台查詢供應與範圍。站內的宅配選項只適用於冷凍禮盒；熟食與冷凍宅配請分開下單。</p></details>
 <details name="faq"><summary>餐點含有哪些常見過敏原？</summary><p>鍋貼與水餃外皮含小麥，部分餡料與醬汁可能含大豆、芝麻或甲殼類。實際販售時，請以店家提供的成分資訊為準。</p></details>
@@ -231,18 +231,20 @@ dialog:not(.drawer){border-radius:18px}
 <dialog id="cart" class="drawer" aria-labelledby="cart-title"><div class="box-head"><h2 id="cart-title">購物車</h2><button class="icon" type="button" data-close aria-label="關閉購物車">✕</button></div><div id="cart-items" class="box-body"></div><div class="box-foot"><div><div>商品總計</div><strong id="cart-total" class="price"></strong></div><button id="checkout-open" class="btn" type="button">前往結帳</button></div></dialog>
 <dialog id="checkout" aria-labelledby="checkout-title"><div class="box-head"><h2 id="checkout-title">確認訂單</h2><button class="icon" type="button" data-close aria-label="關閉訂單確認">✕</button></div>
 <form id="checkout-form"><div class="box-body fields">
-<p class="small">模擬結帳，無須付款。聯絡資料不會送出或儲存。</p>
+<p id="checkout-note" class="small">模擬結帳，無須付款。聯絡資料不會送出或儲存。</p>
 <fieldset class="order-modes"><legend>取餐方式</legend><label><input type="radio" name="mode" value="內用" checked>內用</label><label><input type="radio" name="mode" value="外帶">外帶</label><label><input type="radio" name="mode" value="宅配">宅配（冷凍）</label></fieldset>
 <p id="mode-note" class="small"></p>
 <label id="pickup-field">取餐門市<select name="store"></select></label>
 <label id="address-field" hidden>收件地址<input name="address" autocomplete="street-address" maxlength="160" disabled></label>
 <label>聯絡姓名<input name="name" autocomplete="name" maxlength="50" required></label>
-<label>聯絡電話<input type="tel" name="phone" autocomplete="tel" minlength="8" maxlength="24" required></label>
+<label>聯絡電話<input type="tel" name="phone" autocomplete="tel" minlength="8" maxlength="24" pattern="[0-9+\-() #]{8,24}" title="請輸入 8 碼以上的電話號碼" required></label>
+<input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" hidden>
+<p id="order-error" class="small" role="alert" style="color:#a8261a;font-weight:700" hidden></p>
 <div id="checkout-items" class="small"></div></div>
-<div class="box-foot"><button id="back-cart" type="button" class="btn outline">返回購物車</button><button type="submit" class="btn">建立模擬訂單</button></div></form>
-<div id="receipt" class="box-body receipt" hidden><h3>✓ 訂單已建立</h3><p id="receipt-text"></p><p class="small">這筆訂單只顯示在此頁，店家不會收到。</p><button class="btn" type="button" data-close>繼續逛菜單</button></div>
+<div class="box-foot"><button id="back-cart" type="button" class="btn outline">返回購物車</button><button id="order-submit" type="submit" class="btn">建立模擬訂單</button></div></form>
+<div id="receipt" class="box-body receipt" hidden><h3>✓ 訂單已建立</h3><p id="receipt-text"></p><p id="receipt-note" class="small">這筆訂單只顯示在此頁，店家不會收到。</p><button class="btn" type="button" data-close>繼續逛菜單</button></div>
 </dialog>
-<dialog id="privacy" aria-labelledby="privacy-title"><div class="box-head"><h2 id="privacy-title">隱私權政策</h2><button class="icon" type="button" data-close aria-label="關閉隱私權政策">✕</button></div><div class="box-body"><p>本頁是品牌網站示範。購物車僅在可用時把商品與件數存在瀏覽器。訂單與訂閱表單不傳送或儲存聯絡資料。照片、字體、圖標與樣式由外部服務提供；外部連結由各平台的隱私權政策規範。</p></div></dialog>
+<dialog id="privacy" aria-labelledby="privacy-title"><div class="box-head"><h2 id="privacy-title">隱私權政策</h2><button class="icon" type="button" data-close aria-label="關閉隱私權政策">✕</button></div><div class="box-body"><p>本頁是品牌網站示範。購物車僅在可用時把商品與件數存在瀏覽器。<span id="privacy-order-note">訂單與訂閱表單不傳送或儲存聯絡資料。</span>照片、字體、圖標與樣式由外部服務提供；外部連結由各平台的隱私權政策規範。</p></div></dialog>
 <div class="toasts" role="status" aria-live="polite"><div id="toast" class="notice" hidden></div></div>
 <script>
 'use strict';
@@ -273,8 +275,10 @@ const stores = [
   {name:'信義店',address:'台北市信義區松高路商圈（示範）',phone:'02-0000-0102',hours:'週二至週日 11:30–20:30，週一公休',query:'台北市信義區 松高路'}
 ];
 const money = n => 'NT$ ' + n.toLocaleString('zh-TW');
+// 結帳串接 Google 試算表：貼上 Apps Script 網路應用程式網址（/exec 結尾）。留空則維持示範模式，不送出任何資料。設定方式見 gas/README.md。
+const GAS_URL = '';
 const key = 'golden-edge-cart-v1';
-let items = new Map(), activeStore = 0, toastTimer;
+let items = new Map(), activeStore = 0, toastTimer, sending = false, orderRequestId = '';
 try {
   const saved = JSON.parse(localStorage.getItem(key) || '[]');
   if(Array.isArray(saved)) for(const row of saved) {
@@ -378,7 +382,8 @@ function openCheckout(){
   if(!items.size) return;
   const onlyFrozen=items.size===1 && items.has('gift');
   const dine=form.querySelector('[value="內用"]'), ship=form.querySelector('[value="宅配"]');
-  form.reset();
+  form.reset();$('order-error').hidden=true;
+  if(!orderRequestId) orderRequestId=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
   dine.disabled=items.has('gift');ship.disabled=!onlyFrozen;
   (dine.disabled?form.querySelector('[value="外帶"]'):dine).checked=true;
   form.elements.store.value=String(activeStore);
@@ -413,16 +418,50 @@ cartButton.addEventListener('click',()=>{hideNav();cart.showModal();});
 $('checkout-open').addEventListener('click',openCheckout);
 $('back-cart').addEventListener('click',()=>{checkout.close();cart.showModal();});
 form.addEventListener('change',syncMode);
-form.addEventListener('submit',e=>{
+// 把訂單送到 Google Apps Script；回傳試算表產生的訂單編號。
+async function sendOrder(){
+  const f=form.elements, delivery=f.mode.value==='宅配';
+  // 用 text/plain 送 JSON，瀏覽器才不會先發 CORS 預檢請求（Apps Script 不處理預檢）。
+  const res=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
+    clientId:orderRequestId,mode:f.mode.value,store:delivery?'':f.store.value,address:delivery?f.address.value:'',
+    name:f.name.value,phone:f.phone.value,website:f.website.value,
+    items:[...items].map(([id,qty])=>({id,qty}))
+  })});
+  if(!res.ok) throw new Error('');
+  const data=await res.json();
+  if(!data.ok) throw new Error(data.error||'');
+  return data.orderId;
+}
+form.addEventListener('submit',async e=>{
   e.preventDefault();
-  if(!items.size || !form.reportValidity()) return;
+  if(sending || !items.size || !form.reportValidity()) return;
   const mode=form.elements.mode.value;
   const place=mode==='宅配'?'冷凍宅配':stores[form.elements.store.value].name+' · '+mode;
-  $('receipt-text').textContent=place+'｜'+totals().count+' 件 · '+money(totals().total);
+  const summary=place+'｜'+totals().count+' 件 · '+money(totals().total);
+  let orderId='';
+  if(GAS_URL){
+    const button=$('order-submit'), label=button.textContent, error=$('order-error');
+    sending=true;button.disabled=true;button.textContent='送出中…';error.hidden=true;
+    try { orderId=await sendOrder(); }
+    catch(err){
+      error.textContent=(err.message||'訂單沒有送出，請檢查網路後再試一次')+'。購物車內容已保留。';error.hidden=false;
+      return;
+    }
+    finally { sending=false;button.disabled=false;button.textContent=label; }
+  }
+  $('receipt-text').textContent=(orderId?'訂單編號 '+orderId+'｜':'')+summary;
+  orderRequestId='';
   items.clear();persist();form.reset();form.hidden=true;
   $('checkout-title').textContent='訂單完成';$('receipt').hidden=false;
   $('receipt').querySelector('button').focus();
 });
+if(GAS_URL){
+  $('checkout-note').textContent='送出後，訂單與聯絡資料會傳送給店家。本站不線上收款。';
+  $('order-submit').textContent='送出訂單';
+  $('receipt-note').textContent='店家已收到這筆訂單，請記下訂單編號。';
+  $('faq-order-note').textContent='送出後店家會收到訂單。';
+  $('privacy-order-note').textContent='送出訂單時，取餐方式、品項與你填寫的姓名、電話、收件地址會傳送並儲存在店家的 Google 試算表，僅用於處理訂單。訂閱表單不傳送或儲存信箱。';
+}
 checkout.addEventListener('close',()=>{form.reset();if(!cart.open && !checkout.open) cartButton.focus();});
 $('privacy-open').addEventListener('click',()=>$('privacy').showModal());
 $('subscribe').addEventListener('submit',e=>{e.preventDefault();e.target.reset();$('sub-status').textContent='已完成示範訂閱。';});
