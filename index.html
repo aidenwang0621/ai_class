@@ -237,8 +237,7 @@ dialog:not(.drawer){border-radius:18px}
 <label id="pickup-field">取餐門市<select name="store"></select></label>
 <label id="address-field" hidden>收件地址<input name="address" autocomplete="street-address" maxlength="160" disabled></label>
 <label>聯絡姓名<input name="name" autocomplete="name" maxlength="50" required></label>
-<label>聯絡電話<input type="tel" name="phone" autocomplete="tel" minlength="8" maxlength="24" pattern="[0-9+\-() #]{8,24}" title="請輸入 8 碼以上的電話號碼" required></label>
-<input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" hidden>
+<label>聯絡電話<input type="tel" name="phone" autocomplete="tel" minlength="8" maxlength="24" pattern="[0-9+\-\(\) #]{8,24}" title="請輸入 8 碼以上的電話號碼" required></label>
 <p id="order-error" class="small" role="alert" style="color:#a8261a;font-weight:700" hidden></p>
 <div id="checkout-items" class="small"></div></div>
 <div class="box-foot"><button id="back-cart" type="button" class="btn outline">返回購物車</button><button id="order-submit" type="submit" class="btn">建立模擬訂單</button></div></form>
@@ -424,12 +423,13 @@ async function sendOrder(){
   // 用 text/plain 送 JSON，瀏覽器才不會先發 CORS 預檢請求（Apps Script 不處理預檢）。
   const res=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
     clientId:orderRequestId,mode:f.mode.value,store:delivery?'':f.store.value,address:delivery?f.address.value:'',
-    name:f.name.value,phone:f.phone.value,website:f.website.value,
+    name:f.name.value,phone:f.phone.value,
     items:[...items].map(([id,qty])=>({id,qty}))
   })});
   if(!res.ok) throw new Error('');
   const data=await res.json();
-  if(!data.ok) throw new Error(data.error||'');
+  // 沒有拿到正式的訂單編號，就當作沒有成立，不能讓顧客以為已經下單。
+  if(!data.ok || !/^GE\d/.test(data.orderId||'')) throw new Error(data.error||'');
   return data.orderId;
 }
 form.addEventListener('submit',async e=>{
