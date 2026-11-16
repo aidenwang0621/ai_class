@@ -1,0 +1,17 @@
+{
+  "name": "金邊鍋貼 GOLDEN EDGE",
+  "short_name": "金邊鍋貼",
+  "description": "每日現包、現點現煎。探索招牌鍋貼、冷凍禮盒及門市。",
+  "lang": "zh-Hant-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2d211b",
+  "theme_color": "#2d211b",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

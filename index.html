@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="金邊鍋貼：每日現包、現點現煎。探索招牌鍋貼、冷凍禮盒及門市。">
+<meta name="theme-color" content="#2d211b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="金邊鍋貼">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>金邊鍋貼 GOLDEN EDGE — 一口脆，滿口鮮</title>
 <script defer src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
@@ -63,6 +72,13 @@ dialog{margin:auto;padding:0;border:0;border-radius:8px;background:var(--paper);
 .street.paused *{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){.street *{animation-play-state:paused!important}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* 3D 街景 */
+.street{height:clamp(270px,32vw,450px)}
+.street.s3d{background:linear-gradient(#1b120e 0,#1b120e 10%,#33190f 46%,#6b3820 74%,#2a1810 100%)}
+.street.s3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;display:block}
+.street.s3d::before,.street.s3d::after{content:"";position:absolute;left:0;right:0;z-index:1;pointer-events:none}
+.street.s3d::before{top:0;height:20%;background:linear-gradient(#1b120e,#1b120e00)}
+.street.s3d::after{bottom:0;height:24%;background:linear-gradient(#150c0800,#150c08)}
 /* 視覺升級與動態效果 */
 ::selection{background:#a84122;color:#fff4e7}
 .progress{position:fixed;inset:0 0 auto 0;height:3px;z-index:30;background:linear-gradient(90deg,#a84122,#ffc591,#f0a25a);transform-origin:0 50%;transform:scaleX(0);pointer-events:none}
@@ -205,6 +221,7 @@ dialog:not(.drawer){border-radius:18px}
 
 <footer id="contact"><div class="wrap">
 <div class="foot-grid"><div><p style="font:800 1.55rem var(--serif)">金邊鍋貼</p><p style="color:#e5cdb8;margin-top:7px">門市時間與聯絡資訊請見 <a style="text-decoration:underline" href="#locations">門市據點</a>。</p><a class="btn" style="margin-top:14px" href="https://calendar.app.google/Kvh9F95xHMtysU3NA" target="_blank" rel="noopener">預約時段 ↗</a>
+<button id="install-app" class="btn outline" style="margin:14px 0 0 8px" type="button" hidden>安裝 App</button>
 <div class="socials" aria-label="社群平台入口（示範）"><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram ↗</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook ↗</a><a href="https://line.me/zh-hant/" target="_blank" rel="noopener">LINE ↗</a></div></div>
 <div><h3>訂閱金邊電子報</h3><p id="sub-hint" style="font-size:.8rem;color:#e5cdb8;margin-top:5px">示範訂閱：不寄信，也不儲存信箱。</p><form id="subscribe" class="subscribe"><input name="email" type="email" placeholder="輸入電子郵件" aria-label="訂閱電子郵件" aria-describedby="sub-hint" required><button class="btn" type="submit">訂閱</button></form><p id="sub-status" role="status" style="color:#ffc591"></p></div></div>
 <div class="footnote"><span>© <span id="year">2026</span> 金邊鍋貼 · 品牌網站示範</span><button id="privacy-open" type="button">隱私權政策</button><a href="https://unsplash.com/photos/a-black-plate-topped-with-dumplings-on-top-of-a-wooden-table-klTf2RN37Ts" target="_blank" rel="noopener">主視覺：Mikey Frost / Unsplash ↗</a></div>
@@ -460,6 +477,137 @@ if('IntersectionObserver' in window)new IntersectionObserver(function(e){st.clas
 })();
 </script>
 <script>
+/* 3D 街景：人來人往、走進金邊鍋貼。WebGL 或 three.js 無法使用時保留上方的 2D 版本。 */
+(function(){var st=document.getElementById('street');if(!st)return;
+try{var tc=document.createElement('canvas');if(!(tc.getContext('webgl2')||tc.getContext('webgl')))return}catch(e){return}
+import('https://unpkg.com/three@0.160.0/build/three.module.min.js').then(function(T){try{init(T)}catch(e){console.error('3D street',e)}}).catch(function(){});
+function init(T){
+var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+var rnd=Math.random,PI=Math.PI;function rr(a,b){return a+rnd()*(b-a)}function pick(a){return a[(rnd()*a.length)|0]}
+var renderer=new T.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+var scene=new T.Scene();scene.fog=new T.Fog(0x2a1810,20,50);
+var cam=new T.PerspectiveCamera(32,3,.1,120);
+function L(c,o){var m=new T.MeshLambertMaterial(Object.assign({color:c},o||{}));return m}
+function box(w,h,d,x,y,z,m,par){var b=new T.Mesh(new T.BoxGeometry(w,h,d),m);b.position.set(x,y,z);(par||scene).add(b);return b}
+function tex(w,h,draw){var c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);var t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;t.anisotropy=4;return t}
+function glowTex(inner,outer){return tex(128,128,function(g){var r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,inner);r.addColorStop(1,outer);g.fillStyle=r;g.fillRect(0,0,128,128)})}
+/* 燈光 */
+scene.add(new T.HemisphereLight(0x8a6048,0x24150f,2.2));
+var moon=new T.DirectionalLight(0xffc9a0,1.3);moon.position.set(-6,10,12);scene.add(moon);
+var spill=new T.PointLight(0xffb46a,70,0,2);spill.position.set(0,3,2.6);scene.add(spill);
+var inside=new T.PointLight(0xffc98a,9,0,2);inside.position.set(-1,3.5,-2);scene.add(inside);
+/* 地面 */
+var pave=tex(128,128,function(g){g.fillStyle='#5b3d2c';g.fillRect(0,0,128,128);g.strokeStyle='#4a3023';g.lineWidth=2;for(var i=0;i<=128;i+=32){g.beginPath();g.moveTo(i,0);g.lineTo(i,128);g.moveTo(0,i);g.lineTo(128,i);g.stroke()}g.fillStyle='#634432';g.fillRect(34,34,28,28);g.fillRect(98,66,28,28)});
+pave.wrapS=pave.wrapT=T.RepeatWrapping;pave.repeat.set(50,25);
+var ground=new T.Mesh(new T.PlaneGeometry(100,50),L(0xffffff,{map:pave}));ground.rotation.x=-PI/2;ground.position.z=4;scene.add(ground);
+var glow=new T.Mesh(new T.PlaneGeometry(17,10),new T.MeshBasicMaterial({map:glowTex('rgba(255,190,120,.75)','rgba(255,190,120,0)'),transparent:true,blending:T.AdditiveBlending,depthWrite:false}));glow.rotation.x=-PI/2;glow.position.set(-.4,.02,2.6);scene.add(glow);
+/* 兩側與遠景街屋 */
+function facade(w,h,dim){var k=48,walls=dim?['#2b1b14','#30201a']:['#3d261b','#34221a','#2e1d16','#452b1e'];return tex(Math.round(w*k),Math.round(h*k),function(g,W,H){g.fillStyle=pick(walls);g.fillRect(0,0,W,H);
+var base=dim?0:3,cols=Math.max(1,Math.floor((w-.5)/1.5)),rows=Math.floor((h-base-.6)/2.3),ox=(w-cols*1.5+.6)/2;
+for(var i=0;i<cols;i++)for(var j=0;j<rows;j++){var lit=rnd()<(dim?.3:.55);g.fillStyle=lit?'rgba(255,200,145,'+rr(dim?.25:.45,dim?.6:1).toFixed(2)+')':'#1a100b';g.fillRect((ox+i*1.5)*k,(.6+j*2.3)*k,.9*k,1.3*k);if(lit){g.fillStyle='rgba(60,30,15,.5)';g.fillRect((ox+i*1.5+.43)*k,(.6+j*2.3)*k,.04*k,1.3*k)}}
+if(!dim){var gr=g.createLinearGradient(0,H-2.7*k,0,H);gr.addColorStop(0,'#ffe6c0');gr.addColorStop(1,'#f0a25a');g.globalAlpha=rr(.65,1);g.fillStyle=gr;g.fillRect(.3*k,H-2.6*k,W-.6*k,2.45*k);g.globalAlpha=1;g.fillStyle='#24150f';for(var x=1.3;x<w-.5;x+=rr(1.1,1.9))g.fillRect(x*k,H-2.6*k,.07*k,2.45*k);g.fillStyle='#1a100b';g.fillRect(.6*k,H-3.5*k,W-1.2*k,.55*k);g.fillStyle='rgba(255,200,145,.8)';g.fillRect(W*.25,H-3.3*k,W*.5,.1*k)}})}
+var awn=[0xa84122,0x7d2f18,0xc98a5e,0x3f5a52,0x5b3a2a];
+[-1,1].forEach(function(side){for(var x=4.7;x<30;){var w=rr(3.4,6),h=rr(5.2,9.5),z0=-.2-rnd()*.7,wall=L(0x2a1a13);
+var front=new T.MeshBasicMaterial({map:facade(w,h),toneMapped:false});
+box(w,h,6,side*(x+w/2),h/2,z0-3,[wall,wall,wall,wall,front,wall]);
+var a=box(w-.5,.1,1,side*(x+w/2),2.8,z0+.45,L(pick(awn)));a.rotation.x=.3;
+if(rnd()<.5)box(rr(.8,1.4),rr(.6,1.2),1,side*(x+w*rr(.3,.7)),h+.4,z0-2,L(0x24150f));
+x+=w+.12}});
+for(var bx=-40;bx<40;){var bw=rr(5,9),bh=rr(9,17);box(bw,bh,4,bx+bw/2,bh/2,-14,new T.MeshBasicMaterial({map:facade(bw,bh,true),toneMapped:false}));bx+=bw+.2}
+/* 金邊鍋貼店面 */
+var wood=L(0x4a2a1a),dark=L(0x2a1810),cream=L(0xc48f58,{emissive:0x7a431c,emissiveIntensity:.3}),DX=2.2;
+box(.6,4.2,.25,-3.7,2.1,-.125,wood);box(4,1,.25,-1.4,.5,-.125,wood);box(.8,4.2,.25,1,2.1,-.125,wood);box(1,4.2,.25,3.5,2.1,-.125,wood);box(8,1.3,.25,0,3.55,-.125,dark);
+box(4.3,.08,.95,-1.4,1.04,-.3,L(0x9a6a40));
+box(.25,4.2,6,-3.875,2.1,-3,cream);box(.25,4.2,6,3.875,2.1,-3,cream);
+box(5.5,4.2,.2,-1.25,2.1,-4.1,cream);box(1.1,4.2,.2,3.45,2.1,-4.1,cream);box(1.4,1.5,.2,DX,3.45,-4.1,cream);
+box(8,4.2,.2,0,2.1,-6,L(0x1a0f0a));box(8,.04,6,0,.02,-3,L(0x8a5a36));box(8.6,.22,6.8,0,4.31,-2.9,dark);
+var roof=new T.Mesh(new T.CylinderGeometry(2.4,5.7,1.4,4,1),L(0x21140e,{flatShading:true}));roof.rotation.y=PI/4;roof.scale.set(1.16,1,.92);roof.position.set(0,5.12,-2.9);scene.add(roof);
+var menu=new T.Mesh(new T.PlaneGeometry(4.6,1.1),new T.MeshBasicMaterial({toneMapped:false,map:tex(460,110,function(g){g.fillStyle='#e0ab70';g.fillRect(0,0,460,110);for(var i=0;i<3;i++){g.fillStyle='#3a2014';g.fillRect(12+i*150,10,136,90);g.fillStyle='#ffdcae';for(var j=0;j<4;j++)g.fillRect(26+i*150,26+j*17,rr(50,105),5)}})}));menu.position.set(-1.3,2.75,-3.98);scene.add(menu);
+function signDraw(g,W,H){g.fillStyle='#170d09';g.fillRect(0,0,W,H);g.strokeStyle='#ffc591';g.lineWidth=8;g.strokeRect(10,10,W-20,H-20);g.fillStyle='#ffdcae';g.font='800 132px "Noto Serif TC","Songti TC",serif';g.textAlign='center';g.textBaseline='middle';'金邊鍋貼'.split('').forEach(function(ch,i){g.fillText(ch,W/2+(i-1.5)*200,H/2+6)})}
+var signTex=tex(1024,220,signDraw);
+var sign=new T.Mesh(new T.PlaneGeometry(4.6,.99),new T.MeshBasicMaterial({map:signTex,toneMapped:false}));sign.position.set(-.2,3.55,.03);scene.add(sign);
+if(document.fonts&&document.fonts.load)document.fonts.load('800 132px "Noto Serif TC"','金邊鍋貼').then(function(){signDraw(signTex.image.getContext('2d'),1024,220);signTex.needsUpdate=true}).catch(function(){});
+var awning=new T.Mesh(new T.PlaneGeometry(4.7,1.35),L(0xffffff,{side:T.DoubleSide,emissive:0x40200f,map:tex(260,64,function(g){for(var i=0;i<13;i++){g.fillStyle=i%2?'#f0dcc0':'#b8482a';g.fillRect(i*20,0,20,64)}})}));awning.rotation.x=-1.08;awning.position.set(-1.4,2.78,.62);scene.add(awning);
+var noren=[];for(var n=0;n<4;n++){var ng=new T.PlaneGeometry(.37,.78);ng.translate(0,-.39,0);var nm=new T.Mesh(ng,L(0xb8482a,{side:T.DoubleSide,emissive:0x40170b}));nm.position.set(1.4+.2+n*.4,2.9,.04);scene.add(nm);noren.push(nm)}
+/* 燈籠 */
+var lanMat=new T.MeshBasicMaterial({color:0xff5a30,toneMapped:false}),lanGeo=new T.SphereGeometry(1,16,12),capMat=L(0x170d09),haloTex=glowTex('rgba(255,120,60,.55)','rgba(255,120,60,0)'),big=[];
+function lantern(x,y,z,r,light){var g=new T.Group();g.position.set(x,y+r*2.4,z);var m=new T.Mesh(lanGeo,lanMat);m.scale.set(r,r*1.18,r);m.position.y=-r*2.4;g.add(m);
+var c=new T.Mesh(new T.CylinderGeometry(r*.5,r*.5,r*.3,10),capMat);c.position.y=-r*1.25;g.add(c);var c2=c.clone();c2.position.y=-r*3.55;g.add(c2);
+var h=new T.Sprite(new T.SpriteMaterial({map:haloTex,transparent:true,blending:T.AdditiveBlending,depthWrite:false}));h.scale.set(r*7,r*7,1);h.position.y=-r*2.4;g.add(h);
+if(light){var p=new T.PointLight(0xff7a3a,3,0,2);p.position.y=-r*2.4;g.add(p)}scene.add(g);return g}
+big.push(lantern(-3.7,2.75,.55,.3,true),lantern(3.5,2.75,.55,.3,true));
+[[-4.4,4.3,-30,7.5],[4.4,4.3,30,7.5]].forEach(function(s){for(var t=.05;t<1;t+=.045){var u=1-t;lantern(s[0]+(s[2]-s[0])*t,(u*s[1]+t*s[3])-Math.sin(PI*Math.min(1,(t*8)%1))*.35,.9,.13,false)}});
+/* 小物 */
+function plant(x,z){var p=new T.Mesh(new T.CylinderGeometry(.22,.16,.4,10),L(0x7a4a30));p.position.set(x,.2,z);scene.add(p);var l=new T.Mesh(new T.IcosahedronGeometry(.42,0),L(0x3f6240,{flatShading:true}));l.position.set(x,.75,z);l.scale.y=1.3;scene.add(l)}
+plant(-4.05,.6);plant(.95,.55);
+var board=box(.62,.95,.05,3.75,.48,1.05,L(0x1a0f0a));board.rotation.x=-.22;box(.42,.05,.01,3.75,.72,1.14,L(0xffdcae));box(.3,.04,.01,3.75,.56,1.18,L(0xffdcae));
+var pan=new T.Mesh(new T.CylinderGeometry(.36,.3,.09,20),L(0x1c1614));pan.position.set(-.5,1.13,-.42);scene.add(pan);
+var steamTex=glowTex('rgba(255,245,230,.6)','rgba(255,245,230,0)'),steam=[];for(var sI=0;sI<7;sI++){var sp=new T.Sprite(new T.SpriteMaterial({map:steamTex,transparent:true,depthWrite:false}));sp.userData.o=sI/7;scene.add(sp);steam.push(sp)}
+/* 人物 */
+var G={thigh:new T.CapsuleGeometry(.075,.3,3,8),shin:new T.CapsuleGeometry(.062,.3,3,8),foot:new T.BoxGeometry(.11,.07,.24),torso:new T.CapsuleGeometry(.17,.38,4,12),head:new T.SphereGeometry(.13,14,12),hair:new T.SphereGeometry(.14,14,10,0,PI*2,0,PI*.56),up:new T.CapsuleGeometry(.05,.2,3,8),fore:new T.CapsuleGeometry(.045,.2,3,8),hand:new T.SphereGeometry(.052,8,8),coat:new T.CylinderGeometry(.2,.26,.52,12),dress:new T.CylinderGeometry(.19,.34,.7,12),bag:new T.BoxGeometry(.27,.3,.13),hat:new T.CylinderGeometry(.13,.14,.2,12),brim:new T.CylinderGeometry(.21,.21,.025,14),blob:new T.CircleGeometry(.42,16)};
+var blobMat=new T.MeshBasicMaterial({map:glowTex('rgba(0,0,0,.55)','rgba(0,0,0,0)'),transparent:true,depthWrite:false}),bagMat=L(0xd0552d,{emissive:0x3a1408});
+var coats=[0xc8502b,0xd9a441,0x3f6b6b,0xe8d5b5,0x39445e,0x6b7a45,0x8e4a5a,0xb9a08a,0x34302f,0x7b93a8],pants=[0x2b2622,0x3a3f52,0x4a3b2e,0x1e1e22,0x5a5148],skins=[0xf0c9a4,0xe0ac82,0xc98d62],hairs=[0x1a120e,0x2b1a12,0x3a2a20,0x0f0c0b,0x5a4030];
+function person(o){o=o||{};var g=new T.Group(),b=new T.Group();g.add(b);
+var cm=L(o.coat||pick(coats)),pm=L(o.pants||pick(pants)),sm=L(pick(skins)),hm=L(pick(hairs));
+var bl=new T.Mesh(G.blob,blobMat);bl.rotation.x=-PI/2;bl.position.y=.02;g.add(bl);
+function limb(x,y,g1,g2,m1,m2,l1,l2,end){var a=new T.Group();a.position.set(x,y,0);var u=new T.Mesh(g1,m1);u.position.y=-l1/2;a.add(u);var k=new T.Group();k.position.y=-l1;a.add(k);var s=new T.Mesh(g2,m2);s.position.y=-l2/2;k.add(s);if(end)k.add(end);b.add(a);return {a:a,k:k}}
+function foot(){var f=new T.Mesh(G.foot,L(0x1a1412));f.position.set(0,-.43,.05);return f}
+function hand(){var h=new T.Mesh(G.hand,sm);h.position.y=-.3;return h}
+var lL=limb(-.1,.9,G.thigh,G.shin,pm,pm,.42,.4,foot()),lR=limb(.1,.9,G.thigh,G.shin,pm,pm,.42,.4,foot());
+var aL=limb(-.25,1.48,G.up,G.fore,cm,cm,.3,.28,hand()),aR=limb(.25,1.48,G.up,G.fore,cm,cm,.3,.28,hand());
+var t=new T.Mesh(G.torso,cm);t.position.y=1.2;t.scale.set(1.05,1,.72);b.add(t);
+var style=o.style||pick(['coat','plain','dress','plain','hat']);
+if(style=='coat'||style=='hat'){var c=new T.Mesh(G.coat,cm);c.position.y=.84;c.scale.z=.74;b.add(c)}
+if(style=='dress'){var d=new T.Mesh(G.dress,cm);d.position.y=.72;d.scale.z=.8;b.add(d)}
+var h=new T.Mesh(G.head,sm);h.position.y=1.69;b.add(h);
+if(o.chef){var ch=new T.Mesh(G.hat,L(0xffffff));ch.scale.set(1,1.5,1);ch.position.y=1.92;b.add(ch)}
+else if(style=='hat'){var ht=new T.Mesh(G.hat,L(0x2a2220));ht.position.y=1.86;b.add(ht);var br=new T.Mesh(G.brim,L(0x2a2220));br.position.y=1.79;b.add(br)}
+else{var hr=new T.Mesh(G.hair,hm);hr.position.y=1.7;hr.rotation.x=-.25;b.add(hr);if(style=='dress'){var bk=new T.Mesh(G.head,hm);bk.scale.set(.95,1.25,.7);bk.position.set(0,1.6,-.1);b.add(bk)}}
+var bag=new T.Mesh(G.bag,bagMat);bag.position.y=-.5;bag.visible=false;aR.k.add(bag);
+var s=(o.scale||1)*rr(.93,1.05);g.scale.setScalar(s);scene.add(g);
+return {g:g,b:b,lL:lL,lR:lR,aL:aL,aR:aR,bag:bag,ph:rnd()*6,v:rr(1.05,1.5)*(o.scale?1.1:1),stride:1.5*s,wait:0,ang:0}}
+function pose(p){var s=Math.sin(p.ph),c=Math.cos(p.ph);p.lL.a.rotation.x=-.5*s;p.lR.a.rotation.x=.5*s;p.lL.k.rotation.x=.9*Math.max(0,c);p.lR.k.rotation.x=.9*Math.max(0,-c);
+p.aL.a.rotation.x=.42*s;p.aR.a.rotation.x=p.bag.visible?-.08*s:-.42*s;p.aL.k.rotation.x=-.35;p.aR.k.rotation.x=p.bag.visible?-.1:-.35;p.b.position.y=.03*Math.cos(2*p.ph)-.03}
+var X=24,people=[],made=0;
+function spawn(p,first){var dir=rnd()<.5?1:-1,cust=first?made%2==0:rnd()<.5;made++;p.bag.visible=false;p.wait=0;
+if(cust){var l1=rr(1,2.6),l2=rr(1,2.8),out=rnd()<.5?dir:-dir;
+p.path=[{x:-dir*X,z:l1},{x:DX-dir*.5,z:l1},{x:DX,z:-.4},{x:DX,z:-4.7},{x:DX+1.6,z:-5,wait:rr(1.5,5),bag:true},{x:DX,z:-4.7},{x:DX,z:-.3},{x:DX+out*1.2,z:l2},{x:out*X,z:l2}];
+p.g.position.set(first?-dir*rr(4,X-2):-dir*X,0,l1)}
+else{var l=rnd()<.7?rr(.9,3.4):rr(4.4,6);p.path=[{x:-dir*X,z:l},{x:dir*X,z:l}];p.g.position.set(first?rr(-X,X):-dir*X,0,l)}
+p.i=1;p.ang=Math.atan2(p.path[1].x-p.g.position.x,p.path[1].z-p.g.position.z);p.g.rotation.y=p.ang}
+function step(p,dt){if(p.wait>0){p.wait-=dt;return}var t=p.path[p.i],dx=t.x-p.g.position.x,dz=t.z-p.g.position.z,d=Math.hypot(dx,dz),mv=p.v*dt;
+if(d<=mv){p.g.position.x=t.x;p.g.position.z=t.z;if(t.bag)p.bag.visible=true;if(t.wait)p.wait=t.wait;if(++p.i>=p.path.length)spawn(p)}
+else{p.g.position.x+=dx/d*mv;p.g.position.z+=dz/d*mv;var a=Math.atan2(dx,dz),df=a-p.ang;df=Math.atan2(Math.sin(df),Math.cos(df));p.ang+=df*Math.min(1,dt*9);p.g.rotation.y=p.ang}
+p.ph+=mv/p.stride*PI*2;pose(p)}
+var chefs=[person({chef:true,coat:0xfaf6ee,pants:0xfaf6ee,style:'plain'}),person({chef:true,coat:0xfaf6ee,pants:0x3a3f52,style:'plain'})];
+chefs[0].g.position.set(-2.5,0,-1.15);chefs[1].g.position.set(-.75,0,-1.1);chefs.forEach(function(c){c.g.children[1].visible=false});
+/* 尺寸、鏡頭與動畫迴圈 */
+var cw=0,chh=0,count=0,camZ=15.5;
+function size(){var w=st.clientWidth,h=st.clientHeight;if(!w||!h||(w==cw&&h==chh))return;cw=w;chh=h;renderer.setSize(w,h,false);cam.aspect=w/h;cam.fov=w/h<1.8?36:32;camZ=w/h<1.8?12.5:15.5;cam.updateProjectionMatrix();
+var half=Math.tan(cam.fov*PI/360)*cam.aspect*(camZ+1.5);X=Math.max(11,half+4);
+var want=w/h<1.8?10:w/h<2.6?16:22;while(count<want){var kid=count%6==5;var p=person(kid?{scale:.66,style:'plain'}:{});spawn(p,true);people.push(p);count++}}
+var px=0,py=0,tx=0,ty=0;addEventListener('pointermove',function(e){tx=(e.clientX/innerWidth-.5)*2;ty=(e.clientY/innerHeight-.5)*2},{passive:true});
+var clock=new T.Clock(),time=0,running=false,visible=true;
+function frame(){if(!running)return;requestAnimationFrame(frame);draw(Math.min(clock.getDelta(),.05))}
+function draw(dt){time+=dt;size();px+=(tx-px)*.04;py+=(ty-py)*.04;
+cam.position.set(Math.sin(time*.13)*1.5+px*1.8,2.75-py*.35,camZ+Math.cos(time*.1)*.6);cam.lookAt(px*.4,2.35,-1);
+for(var i=0;i<people.length;i++)step(people[i],dt);
+chefs.forEach(function(c,i){c.aL.a.rotation.x=-1+Math.sin(time*5+i*2)*.18;c.aR.a.rotation.x=-1.1+Math.cos(time*5+i*2)*.18;c.aL.k.rotation.x=c.aR.k.rotation.x=-.5;c.b.rotation.y=Math.sin(time*.7+i)*.25});
+big.forEach(function(l,i){l.rotation.z=Math.sin(time*1.3+i*2)*.07});
+noren.forEach(function(n,i){n.rotation.x=Math.sin(time*1.8+i*.9)*.07});
+steam.forEach(function(s){var f=(time*.28+s.userData.o)%1;s.position.set(-.5+Math.sin(f*5+s.userData.o*9)*.12,1.2+f*1.5,-.42);var k=.3+f*.8;s.scale.set(k,k,1);s.material.opacity=Math.sin(PI*f)*.5});
+renderer.render(scene,cam)}
+function play(on){if(on&&!running&&!calm){running=true;clock.getDelta();frame()}else if(!on)running=false}
+size();for(var w0=0;w0<200;w0++)for(var j=0;j<people.length;j++)step(people[j],.05);
+draw(0);
+st.innerHTML='';st.classList.add('s3d');st.appendChild(renderer.domElement);
+if(calm){addEventListener('resize',function(){draw(0)})}
+else{if('IntersectionObserver' in window)new IntersectionObserver(function(e){visible=e[0].isIntersecting;play(visible&&!document.hidden)}).observe(st);else play(true);
+document.addEventListener('visibilitychange',function(){play(visible&&!document.hidden)})}
+}})();
+</script>
+<script>
 (function(){var d=document,root=d.documentElement;root.classList.add('js');
 var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
 /* 捲動進度與導覽陰影 */
@@ -486,6 +634,15 @@ if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es
 /* 購物車數字彈跳 */
 var badge=d.getElementById('cart-count');
 if(badge&&window.MutationObserver)new MutationObserver(function(){badge.classList.remove('bump');void badge.offsetWidth;badge.classList.add('bump')}).observe(badge,{childList:true,characterData:true,subtree:true});
+})();
+</script>
+<script>
+/* PWA：註冊 service worker，並在可安裝時顯示「安裝 App」按鈕 */
+(function(){if('serviceWorker' in navigator&&location.protocol!=='file:')addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});
+var btn=document.getElementById('install-app'),ev=null;if(!btn)return;
+addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;btn.hidden=false});
+btn.addEventListener('click',function(){if(!ev)return;ev.prompt();ev.userChoice.finally(function(){ev=null;btn.hidden=true})});
+addEventListener('appinstalled',function(){btn.hidden=true});
 })();
 </script>
 </body>
